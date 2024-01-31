@@ -1,5 +1,6 @@
 # easysave
 
-Projet viser � d�velopper un logiciel de sauvegarde.
+Projet viser à développer un logiciel de sauvegarde.
+Test changement de branche
 
-TEST.
+Test branche protégée
