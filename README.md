@@ -1,3 +1,3 @@
 # easysave
 
-Projet viser à développer un logiciel de sauvegarde.
+Projet visant à développer un logiciel de sauvegarde.
