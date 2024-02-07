@@ -118,25 +118,25 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AddBackupJob" xml:space="preserve">
-    <value />
+    <value>Créer un travail de sauvegarde</value>
   </data>
   <data name="ChangeLanguage" xml:space="preserve">
-    <value />
+    <value>Changer de langue</value>
   </data>
   <data name="ExecuteAllBackupJobs" xml:space="preserve">
-    <value />
+    <value>Exécuter tous les travaux de sauvegarde</value>
   </data>
   <data name="ExecuteBackupJob" xml:space="preserve">
-    <value />
+    <value>Exécuter un travail de sauvegarde</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value />
+    <value>Quitter</value>
   </data>
   <data name="ListBackupJobs" xml:space="preserve">
-    <value>List existing Backup Jobs</value>
+    <value>Lister les travaux de sauvegarde existants</value>
   </data>
   <data name="MenuTitle" xml:space="preserve">
-    <value>gsegseg</value>
+    <value>EasySave 1.0</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Bienvenue dans EasySave 1.0</value>
