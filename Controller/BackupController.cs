@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Easysave.Logger;
 using Easysave.Model;
+using Easysave.View;
 
 
 namespace Easysave.Controller
@@ -14,15 +15,15 @@ namespace Easysave.Controller
     public class BackupController
     {
         public Dictionary<int, BackupModel> BackupTasks {  get; set; }
-        public View View { get; set; }
+        public ConsoleView ConsoleView { get; set; }
 
         public DailyLogger DailyLogger { get; set; }
         public StateTrackLogger StateTrackLogger{ get; set; }
 
-        public BackupController(View view, DailyLogger dailyLogger, StateTrackLogger stateTrackLogger) 
+        public BackupController(ConsoleView view, DailyLogger dailyLogger, StateTrackLogger stateTrackLogger) 
         {
             this.BackupTasks = new Dictionary<int, BackupModel>();
-            this.View = view;
+            this.ConsoleView = view;
             this.DailyLogger = dailyLogger;
             this.StateTrackLogger = stateTrackLogger;
         }   
