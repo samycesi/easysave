@@ -63,7 +63,7 @@ namespace Easysave.View
                 switch (option)
                 {
                     case "1":
-                        //AddBackupJob();
+                        AddBackupJob();
                         break;
                     case "2":
                         //ExecuteBackupJob();
@@ -85,6 +85,37 @@ namespace Easysave.View
 
             }
         }
+
+        private void AddBackupJob()
+        {
+            Console.WriteLine();
+
+            Console.WriteLine($"\n------ {resourceManager.GetString("MenuAddBackupJob", cultureInfo)} ------");
+
+
+            Console.Write(resourceManager.GetString("EnterBackupJobName", cultureInfo));
+            var name = Console.ReadLine();
+
+            Console.Write(resourceManager.GetString("EnterSourceDirectoryPath", cultureInfo));
+            var sourceDirectory = Console.ReadLine();
+
+            Console.Write(resourceManager.GetString("EnterTargetDirectoryPath", cultureInfo));
+            var targetDirectory = Console.ReadLine();
+
+            Console.Write(resourceManager.GetString("SelectBackupType", cultureInfo));
+            var typeInput = Console.ReadLine();
+            BackupType type = (typeInput == "1") ? BackupType.Full : BackupType.Differential;
+
+
+            Console.Write(resourceManager.GetString("BackupJobAddedSuccess", cultureInfo));
+            //  backupController.AddBackupTask(name, sourceDirectory, targetDirectory, type);
+ 
+
+            Console.WriteLine();
+
+        }
+
+
 
     }
 }

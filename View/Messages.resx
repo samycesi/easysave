@@ -120,8 +120,20 @@
   <data name="AddBackupJob" xml:space="preserve">
     <value>Create a backup job</value>
   </data>
+  <data name="BackupJobAddedSuccess" xml:space="preserve">
+    <value>Backup job added successfully.</value>
+  </data>
   <data name="ChangeLanguage" xml:space="preserve">
     <value>Change Language</value>
+  </data>
+  <data name="EnterBackupJobName" xml:space="preserve">
+    <value>Enter a name for your backup job :</value>
+  </data>
+  <data name="EnterSourceDirectoryPath" xml:space="preserve">
+    <value>Enter Source Directory Path :</value>
+  </data>
+  <data name="EnterTargetDirectoryPath" xml:space="preserve">
+    <value>Enter Target Directory Path :</value>
   </data>
   <data name="ExecuteAllBackupJobs" xml:space="preserve">
     <value>Execute all backup jobs</value>
@@ -135,8 +147,14 @@
   <data name="ListBackupJobs" xml:space="preserve">
     <value>List existing Backup Jobs</value>
   </data>
+  <data name="MenuAddBackupJob" xml:space="preserve">
+    <value>Backup Job Creation Menu</value>
+  </data>
   <data name="MenuTitle" xml:space="preserve">
     <value>EasySave 1.0</value>
+  </data>
+  <data name="SelectBackupType" xml:space="preserve">
+    <value>Select Backup Type (1 for Full, 2 for Differential):</value>
   </data>
   <data name="SelectOption" xml:space="preserve">
     <value>Please select an option</value>
