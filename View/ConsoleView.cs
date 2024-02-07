@@ -14,24 +14,34 @@ namespace Easysave.View
         private CultureInfo cultureInfo;
 
         
-        public ConsoleView(BackupController controller)
+        public ConsoleView()
         {
-            backupController = controller;
+            //backupController = controller;
             resourceManager = new ResourceManager("EasySave.View.Messages", typeof(ConsoleView).Assembly);
             cultureInfo = new CultureInfo("en");
         }
         
 
-        public ConsoleView()
-        {
-            resourceManager = new ResourceManager("EasySave.View.Messages", typeof(ConsoleView).Assembly);
-            cultureInfo = new CultureInfo("en");
-        }
-
-
-
         private void ChangeLanguage()
         {
+            Console.WriteLine();
+            Console.WriteLine("1. English");
+            Console.WriteLine("2. French");
+            Console.Write("Select language: ");
+            var option = Console.ReadLine();
+            switch (option)
+            {
+                case "1":
+                    cultureInfo = new CultureInfo("en");
+                    break;
+                case "2":
+                    cultureInfo = new CultureInfo("fr");
+                    break;
+                default:
+                    Console.WriteLine("Invalid option");
+                    break;
+            }
+            Console.WriteLine();
 
         }
 
