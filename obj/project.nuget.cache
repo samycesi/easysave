@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "RjVzLAeMR0gcMuH2I+EKu4e9466g23BxJxtnXCyTho1bmZpjEm71jLdITueLEYX8+w7ZQROvY04lKukFBmd5Bw==",
+  "dgSpecHash": "BAhLIpkPzoidR+xObAMlo5b2odtMXFx+Q/WaYSji4P00Exs745AQb3BBhO9nNuwMKkXvage2b3TyyrTZHKR42A==",
   "success": true,
-  "projectFilePath": "C:\\Users\\amals\\Documents\\Programmation Système\\Easysave\\Easysave.csproj",
+  "projectFilePath": "C:\\Dev\\Easysave_v1_gr4\\easysave\\Easysave.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

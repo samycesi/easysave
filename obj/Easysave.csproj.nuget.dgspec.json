@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\amals\\Documents\\Programmation Système\\Easysave\\Easysave.csproj": {}
+    "C:\\Dev\\Easysave_v1_gr4\\easysave\\Easysave.csproj": {}
   },
   "projects": {
-    "C:\\Users\\amals\\Documents\\Programmation Système\\Easysave\\Easysave.csproj": {
+    "C:\\Dev\\Easysave_v1_gr4\\easysave\\Easysave.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\amals\\Documents\\Programmation Système\\Easysave\\Easysave.csproj",
+        "projectUniqueName": "C:\\Dev\\Easysave_v1_gr4\\easysave\\Easysave.csproj",
         "projectName": "Easysave",
-        "projectPath": "C:\\Users\\amals\\Documents\\Programmation Système\\Easysave\\Easysave.csproj",
-        "packagesPath": "C:\\Users\\amals\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\amals\\Documents\\Programmation Système\\Easysave\\obj\\",
+        "projectPath": "C:\\Dev\\Easysave_v1_gr4\\easysave\\Easysave.csproj",
+        "packagesPath": "C:\\Users\\sarac\\.nuget\\packages\\",
+        "outputPath": "C:\\Dev\\Easysave_v1_gr4\\easysave\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\amals\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\sarac\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

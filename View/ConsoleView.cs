@@ -1,30 +1,30 @@
 using System;
 using System.Globalization;
 using System.Resources;
-//using EasySave.Controller;
-//using EasySave.Model;
+using Easysave.Controller;
+using Easysave.Model;
 
 
-namespace EasySave.View
+namespace Easysave.View
 {
-    public class View
+    public class ConsoleView
     {
-        //private readonly BackupController backupController;
+        private readonly BackupController backupController;
         private ResourceManager resourceManager;
         private CultureInfo cultureInfo;
 
-        /**
-        public View(BackupController controller)
+        
+        public ConsoleView(BackupController controller)
         {
             backupController = controller;
             resourceManager = new ResourceManager("EasySave.View.Messages", typeof(ConsoleView).Assembly);
             cultureInfo = new CultureInfo("en");
         }
-        */
+        
 
-        public View()
+        public ConsoleView()
         {
-            resourceManager = new ResourceManager("EasySave.View.Messages", typeof(View).Assembly);
+            resourceManager = new ResourceManager("EasySave.View.Messages", typeof(ConsoleView).Assembly);
             cultureInfo = new CultureInfo("en");
         }
 
@@ -42,6 +42,7 @@ namespace EasySave.View
             {
                 Console.WriteLine($"\n--------- {resourceManager.GetString("MenuTitle", cultureInfo)} ---------");
                 Console.WriteLine($"1. {resourceManager.GetString("AddBackupJob", cultureInfo)}");
+                Console.WriteLine($"2. {resourceManager.GetString("ListBackupJobs", cultureInfo)}");
                 Console.WriteLine($"2. {resourceManager.GetString("ExecuteBackupJob", cultureInfo)}");
                 Console.WriteLine($"3. {resourceManager.GetString("ExecuteAllBackupJobs", cultureInfo)}");
                 Console.WriteLine($"4. {resourceManager.GetString("Exit", cultureInfo)}");
