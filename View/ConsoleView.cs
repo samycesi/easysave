@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Resources;
+using System.Text.RegularExpressions;
 using Easysave.Controller;
 using Easysave.Logger;
 using Easysave.Model;
@@ -211,7 +212,26 @@ namespace Easysave.View
             Console.Write(resourceManager.GetString("Index", cultureInfo));
             var userInput = Console.ReadLine();
 
-            var segments = userInput.Split(';');
+            Regex uniqueJob = new Regex($@"[{MinTask-MaxTask}]", RegexOptions.IgnoreCase);
+            Regex toJob = new Regex($@"[{MinTask-MaxTask}]-[{MinTask-MaxTask}]", RegexOptions.IgnoreCase);
+            Regex andJob = new Regex($@"[{MinTask-MaxTask}];[{MinTask-MaxTask}]", RegexOptions.IgnoreCase);
+
+            bool validInput = false;
+            do
+            {
+                if (uniqueJob.IsMatch(userInput) || toJob.IsMatch(userInput) || andJob.IsMatch(userInput))
+                {
+                    validInput = true;
+                    this.backupController.ExecuteTasks(userInput);
+                }
+                else
+                {
+                    Console.WriteLine($"{resourceManager.GetString("InvalidInput", cultureInfo)}, {resourceManager.GetString("PleaseEnterValidRange", cultureInfo)} (e.g., 1-3).");
+                }
+            } while (!validInput);
+
+
+            /* var segments = userInput.Split(';');
 
             foreach (var segment in segments)
             {
@@ -239,16 +259,16 @@ namespace Easysave.View
                 {
                     Console.WriteLine($"Invalid input in segment '{segment}', please enter a number or a range (e.g., 1 or 1-3).");
                 }
-            }
+            } */
         }
         //private void ExecuteSingleBackupJob(int jobIndex){}
 
 
-   //     private void ExecuteAllBackupJobs()
-     //   {
-       //     backupController.ExecuteAllBackupJobs();
+        //     private void ExecuteAllBackupJobs()
+        //   {
+        //     backupController.ExecuteAllBackupJobs();
         //    Console.WriteLine(resourceManager.GetString("AllJobsExecuted", cultureInfo));
-     //   }
+        //   }
 
     }
 }

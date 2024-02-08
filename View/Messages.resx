@@ -159,6 +159,9 @@
   <data name="InvalidRange" xml:space="preserve">
     <value>Invalid range in segment. </value>
   </data>
+  <data name="InvalidInput" xml:space="preserve">
+    <value>Invalid input.</value>
+  </data>
   <data name="ListBackup" xml:space="preserve">
     <value>------ List of backup jobs ------</value>
   </data>
