@@ -14,8 +14,9 @@ namespace Easysave.Logger
         {
         }
 
-        public DailyLogger(string folderPath) : base(folderPath)
+        public DailyLogger(string filePath) : base(filePath)
         {
+
         }
 
         public void WriteDailyLog(BackupModel model,long fileSize,long fileTransferTime)

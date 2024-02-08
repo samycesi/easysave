@@ -11,23 +11,23 @@ namespace Easysave.Logger
     public class DailyData
     {
         [JsonProperty("Name")]
-        private string Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty("SourceDirectory")]
-        private string SourceDirectory { get; set; }
+        public string SourceDirectory { get; set; }
 
         [JsonProperty("DestinationDirectory")]
-        private string DestinationDirectory { get; set; }
+        public string DestinationDirectory { get; set; }
 
         [JsonProperty("FileSize")]
-        private long FileSize { get; set; }
+        public long FileSize { get; set; }
 
 
         [JsonProperty("FileTransferTime")]
-        private long FileTransferTime { get; set; }
+        public long FileTransferTime { get; set; }
 
         [JsonProperty("Time")]
-        private DateTime Time { get; set; }
+        public DateTime Time { get; set; }
 
         public DailyData(string name, string sourceDirectory, string destinationDirectory, long fileSize, long fileTransferTime, DateTime time)
         {

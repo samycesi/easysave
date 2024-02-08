@@ -1,3 +1,4 @@
+using Easysave.Model;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,6 @@ namespace Easysave.Logger
         {
             string filePath = Path.Combine(folderPath, fileName);
             this.FilePath = filePath;
-            Console.WriteLine("here");
             CreateFile();
         }
 
