@@ -19,15 +19,12 @@ namespace Easysave.Controller
         private const int MinTask = 1;
         private const int MaxTask = 5;
         public Dictionary<int, BackupModel> BackupTasks {  get; set; }
-        public ConsoleView ConsoleView { get; set; }
-
         public DailyLogger DailyLogger { get; set; }
         public StateTrackLogger StateTrackLogger{ get; set; }
 
-        public BackupController(ConsoleView view, DailyLogger dailyLogger, StateTrackLogger stateTrackLogger) 
+        public BackupController(DailyLogger dailyLogger, StateTrackLogger stateTrackLogger) 
         {
             this.BackupTasks = new Dictionary<int, BackupModel>();
-            this.ConsoleView = view;
             this.DailyLogger = dailyLogger;
             this.StateTrackLogger = stateTrackLogger;
         }

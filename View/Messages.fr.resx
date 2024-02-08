@@ -120,8 +120,20 @@
   <data name="AddBackupJob" xml:space="preserve">
     <value>Créer un travail de sauvegarde</value>
   </data>
+  <data name="BackupJobAddedSuccess" xml:space="preserve">
+    <value>Le travail de sauvegarde a été crée avec succès.</value>
+  </data>
   <data name="ChangeLanguage" xml:space="preserve">
     <value>Changer de langue</value>
+  </data>
+  <data name="EnterBackupJobName" xml:space="preserve">
+    <value>Entrez le nom du travail de sauvegarde : </value>
+  </data>
+  <data name="EnterSourceDirectoryPath" xml:space="preserve">
+    <value>Entrez le chemin du répertoire source : </value>
+  </data>
+  <data name="EnterTargetDirectoryPath" xml:space="preserve">
+    <value>Entrez le chemin du répertoire cible : </value>
   </data>
   <data name="ExecuteAllBackupJobs" xml:space="preserve">
     <value>Exécuter tous les travaux de sauvegarde</value>
@@ -132,11 +144,41 @@
   <data name="Exit" xml:space="preserve">
     <value>Quitter</value>
   </data>
+  <data name="Index" xml:space="preserve">
+    <value>Entrez l'index du travail de sauvegarde à executer (par exemple, 1-3 va executer les travaux 1, 2 et 3) :  </value>
+  </data>
+  <data name="InvalidIndex" xml:space="preserve">
+    <value>Index non valide. </value>
+  </data>
+  <data name="InvalidPath" xml:space="preserve">
+    <value>Chemin non valide. Veuillez entrer un chemin de répertoire valide.</value>
+  </data>
+  <data name="InvalidRange" xml:space="preserve">
+    <value>Entrée non valide dans le segment. </value>
+  </data>
+  <data name="ListBackup" xml:space="preserve">
+    <value>Liste de travaux de sauvegarde</value>
+  </data>
   <data name="ListBackupJobs" xml:space="preserve">
     <value>Lister les travaux de sauvegarde existants</value>
   </data>
+  <data name="MaximumNumber" xml:space="preserve">
+    <value>Erreur : Le nombre maximum de travaux de sauvegarde a été atteint (5).</value>
+  </data>
+  <data name="MenuAddBackupJob" xml:space="preserve">
+    <value>Menu de création de travail de sauvegarde</value>
+  </data>
   <data name="MenuTitle" xml:space="preserve">
     <value>EasySave 1.0</value>
+  </data>
+  <data name="PleaseEnterValidRange" xml:space="preserve">
+    <value>Veuillez saisir un nombre ou une plage. </value>
+  </data>
+  <data name="SelectBackupType" xml:space="preserve">
+    <value>Sélectionnez le type de sauvegarde (1 pour Complète, 2 pour Différentielle) : </value>
+  </data>
+  <data name="SelectOption" xml:space="preserve">
+    <value>Selectionnez une option</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Bienvenue dans EasySave 1.0</value>
