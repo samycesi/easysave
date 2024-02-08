@@ -126,6 +126,9 @@
   <data name="ChangeLanguage" xml:space="preserve">
     <value>Change Language</value>
   </data>
+  <data name="dailyPath" xml:space="preserve">
+    <value>Please enter the path for the daily backup :</value>
+  </data>
   <data name="EnterBackupJobName" xml:space="preserve">
     <value>Enter a name for your backup job : </value>
   </data>
@@ -179,6 +182,9 @@
   </data>
   <data name="SelectOption" xml:space="preserve">
     <value>Please select an option</value>
+  </data>
+  <data name="statePath" xml:space="preserve">
+    <value>Please enter the path for the state backup : </value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to EasySave 1.0</value>

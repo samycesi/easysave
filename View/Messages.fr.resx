@@ -126,6 +126,9 @@
   <data name="ChangeLanguage" xml:space="preserve">
     <value>Changer de langue</value>
   </data>
+  <data name="dailyPath" xml:space="preserve">
+    <value>Entrez le chemin du fichier pour stocker le fichier de log journalier :</value>
+  </data>
   <data name="EnterBackupJobName" xml:space="preserve">
     <value>Entrez le nom du travail de sauvegarde : </value>
   </data>
@@ -179,6 +182,9 @@
   </data>
   <data name="SelectOption" xml:space="preserve">
     <value>Selectionnez une option</value>
+  </data>
+  <data name="statePath" xml:space="preserve">
+    <value>Entrez le fichier pour stocker el fichier de log en temps réel : </value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Bienvenue dans EasySave 1.0</value>

@@ -22,6 +22,6 @@ class Program
     
         ConsoleView view = new ConsoleView(stateTrackPath, dailyPath);
         
-        view.DisplayMenu(); // Démarrer l'interaction avec l'utilisateur
+        view.DisplayMenu();
     }
 }

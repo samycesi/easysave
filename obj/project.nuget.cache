@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "BAhLIpkPzoidR+xObAMlo5b2odtMXFx+Q/WaYSji4P00Exs745AQb3BBhO9nNuwMKkXvage2b3TyyrTZHKR42A==",
+  "dgSpecHash": "FMQOU08Abt2a+r9AYvGX2TCHRJkS7W8mDKypxkKZVAk7AXSIVwxXEhkpOI+aoMzZKNxGpanraMrFMFgvHOEPMw==",
   "success": true,
-  "projectFilePath": "C:\\Dev\\Easysave_v1_gr4\\easysave\\Easysave.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\amals\\Documents\\Programmation Système\\Projetv1\\easysave\\Easysave.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\amals\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
   "logs": []
 }

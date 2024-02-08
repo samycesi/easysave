@@ -21,14 +21,15 @@ namespace Easysave.View
 
         public ConsoleView(string stateTrackPath, string dailyPath)
         {
+            resourceManager = new ResourceManager("EasySave.View.Messages", typeof(ConsoleView).Assembly);
+            cultureInfo = new CultureInfo("en");
+
             DailyLogger dailyLogger;
             StateTrackLogger stateTrackLogger;
 
-            
-
             if (dailyPath.Length == 0)
             {
-                Console.WriteLine("Please enter the path to the daily file: ");
+                Console.WriteLine($"1. {resourceManager.GetString("dailyPath", cultureInfo)}");
                 string dailyFolderPath = Console.ReadLine();
                 dailyLogger = new DailyLogger(dailyFolderPath, DateTime.Today.ToString("yyyy-MM-dd")+".json");
             }
@@ -39,7 +40,7 @@ namespace Easysave.View
             }
             if(stateTrackPath.Length == 0)
             {
-                Console.WriteLine("Please enter the path to the state file: ");
+                Console.WriteLine($"1. {resourceManager.GetString("statePath", cultureInfo)}");
                 string stateTrackFolderPath = Console.ReadLine();
                 stateTrackLogger = new StateTrackLogger(stateTrackFolderPath, "state.json");
             }
@@ -57,8 +58,6 @@ namespace Easysave.View
 
 
             backupController = new BackupController(dailyLogger, stateTrackLogger);
-            resourceManager = new ResourceManager("EasySave.View.Messages", typeof(ConsoleView).Assembly);
-            cultureInfo = new CultureInfo("en");
         }
 
 
