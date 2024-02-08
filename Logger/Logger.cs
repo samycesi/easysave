@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,29 +7,29 @@ using System.Threading.Tasks;
 
 namespace Easysave.Logger
 {
-    public abstract class Logger
+    public class Logger
     {
-        public string LogFilePath { get; set; }
+        public string FilePath { get; set; }
 
-        public Logger(string filePath)
+        public Logger(string folderPath, string fileName)
         {
-            this.LogFilePath = filePath;
+            string filePath = Path.Combine(folderPath, fileName);
+            this.FilePath = filePath;
+            Console.WriteLine("here");
+            CreateFile();
+
+
         }
 
         /// <summary>
-        ///     This method writes the data in the log file
-        ///     
-        ///     ARGUMENTS A DEFINIR - PEUT ETRE PAS NECESSAIRE ?
+        ///     Creates a json file from the name 
+        ///     using LogFilPath as the path
         /// </summary>
-        public abstract void WriteLog();
-
-        /// <summary>
-        ///     This method creates a file using the input as the name
-        ///     using the attribute LogFilePath for the path
-        /// </summary>
-        public void CreateFile(string fileName)
+        public void CreateFile()
         {
-
+            File.WriteAllText(this.FilePath, "{}");
         }
+
+
     }
 }
