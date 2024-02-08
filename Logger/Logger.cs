@@ -17,8 +17,11 @@ namespace Easysave.Logger
             this.FilePath = filePath;
             Console.WriteLine("here");
             CreateFile();
+        }
 
-
+        public Logger(string filepath)
+        {
+            this.FilePath = filepath;
         }
 
         /// <summary>
