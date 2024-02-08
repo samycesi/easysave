@@ -2,7 +2,9 @@ using System;
 using System.Globalization;
 using System.Resources;
 using Easysave.Controller;
+using Easysave.Logger;
 using Easysave.Model;
+using Newtonsoft.Json;
 
 
 namespace Easysave.View
@@ -17,9 +19,44 @@ namespace Easysave.View
         private const int MaxTask = 5;
 
 
-        public ConsoleView()
+        public ConsoleView(string stateTrackPath, string dailyPath)
         {
-            backupController = new BackupController();
+            DailyLogger dailyLogger;
+            StateTrackLogger stateTrackLogger;
+
+            
+
+            if (dailyPath.Length == 0)
+            {
+                Console.WriteLine("Please enter the path to the daily file: ");
+                string dailyFolderPath = Console.ReadLine();
+                dailyLogger = new DailyLogger(dailyFolderPath, DateTime.Today.ToString("yyyy-MM-dd")+".json");
+            }
+            else
+            {
+                dailyLogger = new DailyLogger(dailyPath);
+
+            }
+            if(stateTrackPath.Length == 0)
+            {
+                Console.WriteLine("Please enter the path to the state file: ");
+                string stateTrackFolderPath = Console.ReadLine();
+                stateTrackLogger = new StateTrackLogger(stateTrackFolderPath, "state.json");
+            }
+            else
+            {
+                stateTrackLogger = new StateTrackLogger(stateTrackPath);
+            }
+
+            /// Update Config
+            string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
+            string jsonFilePath = Path.Combine(solutionDir, "AppConfig.json");
+            AppConfigData appConfig = new AppConfigData(stateTrackLogger.FilePath, dailyLogger.FilePath);
+            string updatedJson = JsonConvert.SerializeObject(appConfig, Formatting.Indented);
+            File.WriteAllText(jsonFilePath, updatedJson);
+
+
+            backupController = new BackupController(dailyLogger, stateTrackLogger);
             resourceManager = new ResourceManager("EasySave.View.Messages", typeof(ConsoleView).Assembly);
             cultureInfo = new CultureInfo("en");
         }
