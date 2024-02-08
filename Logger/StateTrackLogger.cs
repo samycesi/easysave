@@ -18,10 +18,12 @@ namespace Easysave.Logger
     {
         public StateTrackLogger(string folderPath,string filename) : base(folderPath,filename)
         {
+            this.Init();
         }
 
         public StateTrackLogger(string folderPath) : base(folderPath)
         {
+            this.Init();
         }
 
         /// <summary>

@@ -161,7 +161,7 @@ namespace Easysave.Controller
 				DirectoryInfo[] dirs = dir.GetDirectories();
 
 				// Create the destination directory if it doesn't exist (for differential backup)
-				if (backupType == BackupType.Differential && !currentDestination.Exists)
+				if (!currentDestination.Exists)
 					Directory.CreateDirectory(currentDestination.FullName);
 
 				// Copy files from the current directory to the destination directory
@@ -274,5 +274,13 @@ namespace Easysave.Controller
 
 			return (size, fileCount);
 		}
-	}
+
+        public void ExecuteAllTasks()
+        {
+            foreach (var task in BackupTasks)
+			{
+				ExecuteTaskByKey(task.Key);
+			}
+        }
+    }
 }

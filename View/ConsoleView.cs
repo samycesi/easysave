@@ -209,16 +209,18 @@ namespace Easysave.View
 
         private void ExecuteBackupJob()
         {
-            Console.Write(resourceManager.GetString("Index", cultureInfo));
-            var userInput = Console.ReadLine();
 
-            Regex uniqueJob = new Regex($@"[{MinTask-MaxTask}]", RegexOptions.IgnoreCase);
-            Regex toJob = new Regex($@"[{MinTask-MaxTask}]-[{MinTask-MaxTask}]", RegexOptions.IgnoreCase);
-            Regex andJob = new Regex($@"[{MinTask-MaxTask}];[{MinTask-MaxTask}]", RegexOptions.IgnoreCase);
+            Regex uniqueJob = new Regex($@"[{MinTask}-{MaxTask}]", RegexOptions.IgnoreCase);
+            Regex toJob = new Regex($@"[{MinTask}-{MaxTask}]-[{MinTask}-{MaxTask}]", RegexOptions.IgnoreCase);
+            Regex andJob = new Regex($@"[{MinTask}-{MaxTask}];[{MinTask}-{MaxTask}]", RegexOptions.IgnoreCase);
+
+            Console.WriteLine(uniqueJob);
 
             bool validInput = false;
             do
             {
+                Console.Write(resourceManager.GetString("Index", cultureInfo));
+                var userInput = Console.ReadLine();
                 if (uniqueJob.IsMatch(userInput) || toJob.IsMatch(userInput) || andJob.IsMatch(userInput))
                 {
                     validInput = true;
@@ -264,11 +266,11 @@ namespace Easysave.View
         //private void ExecuteSingleBackupJob(int jobIndex){}
 
 
-        //     private void ExecuteAllBackupJobs()
-        //   {
-        //     backupController.ExecuteAllBackupJobs();
-        //    Console.WriteLine(resourceManager.GetString("AllJobsExecuted", cultureInfo));
-        //   }
+        private void ExecuteAllBackupJobs()
+        {
+            backupController.ExecuteAllTasks();
+            /* Console.WriteLine(resourceManager.GetString("AllJobsExecuted", cultureInfo)); */
+        }
 
     }
 }
