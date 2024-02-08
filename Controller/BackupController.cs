@@ -15,17 +15,12 @@ namespace Easysave.Controller
     public class BackupController
     {
         public Dictionary<int, BackupModel> BackupTasks {  get; set; }
-        public ConsoleView ConsoleView { get; set; }
 
-        public DailyLogger DailyLogger { get; set; }
-        public StateTrackLogger StateTrackLogger{ get; set; }
 
-        public BackupController(ConsoleView view, DailyLogger dailyLogger, StateTrackLogger stateTrackLogger) 
+        public BackupController() 
         {
             this.BackupTasks = new Dictionary<int, BackupModel>();
-            this.ConsoleView = view;
-            this.DailyLogger = dailyLogger;
-            this.StateTrackLogger = stateTrackLogger;
+
         }   
 
         /// <summary>
