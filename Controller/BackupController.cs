@@ -55,23 +55,39 @@ namespace Easysave.Controller
 		/// <param name="key"></param>
 		private void ExecuteTaskByKey(int key)
 		{
-			// Get the backup task corresponding to the key
 			BackupModel task = BackupTasks[key];
+			string sourceDirectory = task.SourceDirectory;
+			string destinationDirectory = task.DestinationDirectory;
+			BackupType backupType = task.Type;
 
-			// Create a stack to manage directories to be processed
-			var stack = new Stack<Tuple<string, string>>();
+			var sourceDir = new DirectoryInfo(sourceDirectory);
+			var destDir = new DirectoryInfo(destinationDirectory);
 
-			// Push the initial directory onto the stack
-			stack.Push(Tuple.Create(task.SourceDirectory, task.DestinationDirectory));
+			if (!sourceDir.Exists)
+				throw new DirectoryNotFoundException($"Source directory not found: {sourceDir.FullName}");
 
-			// Continue processing directories until the stack is empty
+			// Create destination directory if it doesn't exist
+			if (!destDir.Exists)
+			{
+				Directory.CreateDirectory(destinationDirectory); // Create destination directory
+			}
+
+			// Total size of the backup
+			long totalBackupSize = 0;
+
+			// Measure the execution time
+			var stopwatch = Stopwatch.StartNew();
+
+			// Perform backup (full or differential)
+			Stack<(DirectoryInfo, DirectoryInfo)> stack = new Stack<(DirectoryInfo, DirectoryInfo)>();
+			stack.Push((sourceDir, destDir));
+
 			while (stack.Count > 0)
 			{
-				// Pop the top directory from the stack
 				var (currentSource, currentDestination) = stack.Pop();
 
 				// Get information about the current directory
-				var dir = new DirectoryInfo(currentSource);
+				var dir = currentSource;
 
 				// Check if the directory exists
 				if (!dir.Exists)
@@ -80,23 +96,34 @@ namespace Easysave.Controller
 				// Get subdirectories of the current directory
 				DirectoryInfo[] dirs = dir.GetDirectories();
 
-				// Create the destination directory
-				Directory.CreateDirectory(currentDestination);
+				// Create the destination directory if it doesn't exist (for differential backup)
+				if (backupType == BackupType.Differential && !currentDestination.Exists)
+					Directory.CreateDirectory(currentDestination.FullName);
 
 				// Copy files from the current directory to the destination directory
 				foreach (FileInfo file in dir.GetFiles())
 				{
-					string targetFilePath = Path.Combine(currentDestination, file.Name);
-					file.CopyTo(targetFilePath);
+					string targetFilePath = Path.Combine(currentDestination.FullName, file.Name);
+					FileInfo destFile = new FileInfo(targetFilePath);
+
+					// For full backup or if the file doesn't exist in the destination directory or if it's newer in the source directory,
+					// perform a differential backup by copying the file from source to destination
+					if (backupType == BackupType.Full || !destFile.Exists || file.LastWriteTime > destFile.LastWriteTime)
+					{
+						file.CopyTo(targetFilePath, true);
+						totalBackupSize += file.Length;
+					}
 				}
 
 				// Add subdirectories to the stack for further processing
 				foreach (DirectoryInfo subDir in dirs)
 				{
-					string newDestinationDir = Path.Combine(currentDestination, subDir.Name);
-					stack.Push(Tuple.Create(subDir.FullName, newDestinationDir));
+					string newDestinationDir = Path.Combine(currentDestination.FullName, subDir.Name);
+					stack.Push((subDir, new DirectoryInfo(newDestinationDir)));
 				}
 			}
+			stopwatch.Stop();
+			var duration = stopwatch.Elapsed;
 		}
 
 		/// <summary>
