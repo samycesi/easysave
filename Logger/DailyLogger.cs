@@ -1,3 +1,5 @@
+using Easysave.Model;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,20 +10,22 @@ namespace Easysave.Logger
 {
     public class DailyLogger : Logger
     {
-        public DailyLogger (string filePath) : base(filePath)
+        public DailyLogger (string folderPath,string filename) : base(folderPath,filename)
         {
-
         }
 
-
-        /// <summary>
-        ///     Implements the method enabling to write data in the log file
-        ///     
-        ///     ARGUMENTS A DEFINIR - PEUT ETRE PAS NECESSAIRE ?
-        /// </summary>
-        public override void WriteLog()
+        public DailyLogger(string folderPath) : base(folderPath)
         {
+        }
 
+        public void WriteDailyLog(BackupModel model,long fileSize,long fileTransferTime)
+        {
+            DailyData data = new DailyData(model.Name,model.SourceDirectory,model.DestinationDirectory,fileSize,fileTransferTime,DateTime.Now);
+            using (StreamWriter sw = new StreamWriter(this.FilePath, true))
+            {
+                string JsonOutput = JsonConvert.SerializeObject(data);
+                sw.WriteLine($"{JsonOutput}");
+            }
         }
 
 

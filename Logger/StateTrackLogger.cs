@@ -16,7 +16,11 @@ namespace Easysave.Logger
 {
     public class StateTrackLogger : Logger
     {
-        public StateTrackLogger(string folderPath) : base(folderPath, "state.json")
+        public StateTrackLogger(string folderPath,string filename) : base(folderPath,filename)
+        {
+        }
+
+        public StateTrackLogger(string folderPath) : base(folderPath)
         {
         }
 
