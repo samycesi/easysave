@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
@@ -8,20 +9,25 @@ using System.Threading.Tasks;
 using Easysave.Logger;
 using Easysave.Model;
 using Easysave.View;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace Easysave.Controller
 {
     public class BackupController
     {
+        private const int MinTask = 1;
+        private const int MaxTask = 5;
         public Dictionary<int, BackupModel> BackupTasks {  get; set; }
+        public DailyLogger DailyLogger { get; set; }
+        public StateTrackLogger StateTrackLogger{ get; set; }
 
-
-        public BackupController() 
+        public BackupController(DailyLogger dailyLogger, StateTrackLogger stateTrackLogger) 
         {
             this.BackupTasks = new Dictionary<int, BackupModel>();
-
-        }   
+            this.DailyLogger = dailyLogger;
+            this.StateTrackLogger = stateTrackLogger;
+        }
 
         /// <summary>
         ///     This method adds a task in the dictionary of tasks
@@ -29,8 +35,23 @@ namespace Easysave.Controller
         /// <param name="task"></param>
         public void AddBackupTask(BackupModel task)
         {
+            this.BackupTasks.Add(AvailableKey(), task);
+        }
 
-
+        /// <summary>
+        ///     This method determines which key is available in the dictionary (from 1 to 5)
+        ///     The view prevents the user from adding a sixth task
+        /// </summary>
+        private int AvailableKey()
+        {
+            for (int key = MinTask; key <= MaxTask; key++)
+            {
+                if (!this.BackupTasks.ContainsKey(key))
+                {
+                    return key;
+                }
+            }
+            throw new InvalidOperationException("Plus de place disponible.");
         }
 
         /// <summary>
@@ -56,10 +77,13 @@ namespace Easysave.Controller
         /// <summary>
         ///     This method deletes a task from the dictionary depending to the key corresponding to a ask
         /// </summary>
-        /// <param name="key"></param>
-        public void DeleteBackupTask(int key)
+        /// <param name="taskToRemove"></param>
+        public void DeleteBackupTask(int taskToRemove)
         {
-
+            if (this.BackupTasks.ContainsKey(taskToRemove))
+            {
+                this.BackupTasks.Remove(taskToRemove);
+            }
         }
 
         /// <summary>
