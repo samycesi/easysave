@@ -16,9 +16,10 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Easysave.Controller
 {
     public class BackupController
-    {
-        private const int MinTask = 1;
-        private const int MaxTask = 5;
+	{
+        public static int MinTask = 1;
+        public static int MaxTask = 5;
+
         public Dictionary<int, BackupModel> BackupTasks {  get; set; }
         public DailyLogger DailyLogger { get; set; }
         public StateTrackLogger StateTrackLogger{ get; set; }

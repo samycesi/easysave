@@ -16,10 +16,6 @@ namespace Easysave.View
         private ResourceManager resourceManager;
         private CultureInfo cultureInfo;
 
-        private const int MinTask = 1;
-        private const int MaxTask = 5;
-
-
         public ConsoleView(string stateTrackPath, string dailyPath)
         {
             resourceManager = new ResourceManager("EasySave.View.Messages", typeof(ConsoleView).Assembly);
@@ -30,26 +26,23 @@ namespace Easysave.View
 
             if (dailyPath.Length == 0)
             {
-                Console.WriteLine($"1. {resourceManager.GetString("dailyPath", cultureInfo)}");
-                string dailyFolderPath = Console.ReadLine();
-                dailyLogger = new DailyLogger(dailyFolderPath, DateTime.Today.ToString("yyyy-MM-dd")+".json");
+                string dailyFolderPath = RequireValidPath("dailyPath");
+                dailyLogger = new DailyLogger(dailyFolderPath, DateTime.Today.ToString("yyyy-MM-dd") + ".json");
             }
             else
             {
                 dailyLogger = new DailyLogger(dailyPath);
 
             }
-            if(stateTrackPath.Length == 0)
+            if (stateTrackPath.Length == 0)
             {
-                Console.WriteLine($"1. {resourceManager.GetString("statePath", cultureInfo)}");
-                string stateTrackFolderPath = Console.ReadLine();
+                string stateTrackFolderPath = RequireValidPath("statePath");
                 stateTrackLogger = new StateTrackLogger(stateTrackFolderPath, "state.json");
             }
             else
             {
                 stateTrackLogger = new StateTrackLogger(stateTrackPath);
             }
-
             /// Update Config
             string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
             string jsonFilePath = Path.Combine(solutionDir, "AppConfig.json");
@@ -60,7 +53,6 @@ namespace Easysave.View
 
             backupController = new BackupController(dailyLogger, stateTrackLogger);
         }
-
 
         private void ChangeLanguage()
         {
@@ -109,7 +101,7 @@ namespace Easysave.View
                         ListBackupTasks();
                         break;
                     case "3":
-                        ExecuteBackupJob();
+                        ExecuteBackupTasks();
                         break;
                     case "4":
                         //backupController.ExecuteAllBackupTask();
@@ -129,6 +121,12 @@ namespace Easysave.View
             }
         }
 
+        public void ChangeLogPaths()
+        {
+            // case 1
+
+            // case 2
+        }
 
         private void AddBackupTask()
         {
@@ -189,7 +187,6 @@ namespace Easysave.View
             Console.WriteLine();
         }
 
-
         private void ListBackupTasks()
         {
             Console.WriteLine();
@@ -207,12 +204,12 @@ namespace Easysave.View
             }
         }
 
-        private void ExecuteBackupJob()
+        private void ExecuteBackupTasks()
         {
 
-            Regex uniqueJob = new Regex($@"[{MinTask}-{MaxTask}]", RegexOptions.IgnoreCase);
-            Regex toJob = new Regex($@"[{MinTask}-{MaxTask}]-[{MinTask}-{MaxTask}]", RegexOptions.IgnoreCase);
-            Regex andJob = new Regex($@"[{MinTask}-{MaxTask}];[{MinTask}-{MaxTask}]", RegexOptions.IgnoreCase);
+            Regex uniqueJob = new Regex($@"[{BackupController.MinTask}-{BackupController.MaxTask}]", RegexOptions.IgnoreCase);
+            Regex toJob = new Regex($@"[{BackupController.MinTask}-{BackupController.MaxTask}]-[{BackupController.MinTask}-{BackupController.MaxTask}]", RegexOptions.IgnoreCase);
+            Regex andJob = new Regex($@"[{BackupController.MinTask}-{BackupController.MaxTask}];[{BackupController.MinTask}-{BackupController.MaxTask}]", RegexOptions.IgnoreCase);
 
             Console.WriteLine(uniqueJob);
 
@@ -266,11 +263,44 @@ namespace Easysave.View
         //private void ExecuteSingleBackupJob(int jobIndex){}
 
 
-        private void ExecuteAllBackupJobs()
+        private void ExecuteAllBackupTasks()
         {
             backupController.ExecuteAllTasks();
             /* Console.WriteLine(resourceManager.GetString("AllJobsExecuted", cultureInfo)); */
         }
 
+        private Boolean PathIsValid(string path)
+        {
+            if (Path.IsPathRooted(path)) // if format is valid
+            {
+                if (Directory.Exists(path)) // if directory exists 
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void DeleteBackupTask()
+        {
+
+        }
+
+        private string RequireValidPath(string messageLogPathKey)
+        {
+            Console.WriteLine($"{resourceManager.GetString(messageLogPathKey, cultureInfo)}");
+            string folderPath = Console.ReadLine();
+            Boolean pathIsValid = this.PathIsValid(folderPath);
+            while (!pathIsValid)
+            {
+                Console.WriteLine($"{resourceManager.GetString("InvalidPath", cultureInfo)}");
+                Console.WriteLine($"{resourceManager.GetString(messageLogPathKey, cultureInfo)}");
+                folderPath = Console.ReadLine();
+                pathIsValid = this.PathIsValid(folderPath);
+            }
+            return folderPath;
+        }
     }
+
 }
+
