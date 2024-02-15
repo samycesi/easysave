@@ -175,7 +175,7 @@
     <value>Backup Job Creation Menu</value>
   </data>
   <data name="MenuTitle" xml:space="preserve">
-    <value>EasySave 1.0</value>
+    <value>EasySave 1.1</value>
   </data>
   <data name="PleaseEnterValidRange" xml:space="preserve">
     <value>Please enter a valid range. </value>
@@ -191,5 +191,14 @@
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to EasySave 1.0</value>
+  </data>
+  <data name="EnterDeleteBackup" xml:space="preserve">
+    <value>Enter the index of the Backup Task to delete (enter 0 to cancel) :</value>
+  </data>
+  <data name="DeleteBackup" xml:space="preserve">
+    <value>Delete a backup job</value>
+  </data>
+  <data name="NonExistentBackup" xml:space="preserve">
+    <value>No backup task corresponds to this index.</value>
   </data>
 </root>

@@ -175,7 +175,7 @@
     <value>Menu de création de travail de sauvegarde</value>
   </data>
   <data name="MenuTitle" xml:space="preserve">
-    <value>EasySave 1.0</value>
+    <value>EasySave 1.1</value>
   </data>
   <data name="PleaseEnterValidRange" xml:space="preserve">
     <value>Veuillez saisir un nombre ou une plage. </value>
@@ -187,9 +187,18 @@
     <value>Selectionnez une option</value>
   </data>
   <data name="statePath" xml:space="preserve">
-    <value>Entrez le fichier pour stocker el fichier de log en temps réel : </value>
+    <value>Entrez le fichier pour stocker le fichier de log en temps réel : </value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Bienvenue dans EasySave 1.0</value>
+  </data>
+  <data name="EnterDeleteBackup" xml:space="preserve">
+    <value>Entrez l'index du travail de sauvegarde à supprimer (entrez 0 pour annuler) :</value>
+  </data>
+  <data name="DeleteBackup" xml:space="preserve">
+    <value>Supprimer un travail de sauvegarde</value>
+  </data>
+  <data name="NonExistentBackup" xml:space="preserve">
+    <value>Aucun travail de sauvegarde ne correspond à cet index.</value>
   </data>
 </root>
