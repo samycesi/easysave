@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Easysave.Logger;
 using Easysave.Model;
@@ -19,6 +20,7 @@ namespace Easysave.Controller
 	{
         public static int MinTask = 1;
         public static int MaxTask = 5;
+        private const string SavePath = "../../../Config/BackupSave.json";
 
         public Dictionary<int, BackupModel> BackupTasks {  get; set; }
         public DailyLogger DailyLogger { get; set; }
@@ -26,7 +28,15 @@ namespace Easysave.Controller
 
         public BackupController(DailyLogger dailyLogger, StateTrackLogger stateTrackLogger) 
         {
-            this.BackupTasks = new Dictionary<int, BackupModel>();
+            Dictionary<int, BackupModel> loadedBackupTasks = LoadBackupTasks();
+            if (loadedBackupTasks.Count == 0)
+            {
+                this.BackupTasks = new Dictionary<int, BackupModel>();
+            }
+            else
+            {
+                this.BackupTasks = loadedBackupTasks;
+            }
             this.DailyLogger = dailyLogger;
             this.StateTrackLogger = stateTrackLogger;
         }
@@ -38,6 +48,7 @@ namespace Easysave.Controller
         public void AddBackupTask(BackupModel task)
         {
             this.BackupTasks.Add(AvailableKey(), task);
+			SaveBackupTasks();
         }
 
         /// <summary>
@@ -93,14 +104,27 @@ namespace Easysave.Controller
 
         /// <summary>
         ///     This method deletes a task from the dictionary depending to the key corresponding to a ask
+		///     Throws an exception if the input is invalid (not an int or not a valid key)
         /// </summary>
         /// <param name="taskToRemove"></param>
-        public void DeleteBackupTask(int taskToRemove)
+        public void DeleteBackupTask(string taskToRemove)
         {
-            if (this.BackupTasks.ContainsKey(taskToRemove))
-            {
-                this.BackupTasks.Remove(taskToRemove);
-            }
+			if(int.TryParse(taskToRemove, out int key))
+			{
+                if (this.BackupTasks.ContainsKey(key))
+                {
+                    this.BackupTasks.Remove(key);
+                    SaveBackupTasks();
+				}
+				else
+				{
+					throw new Exception("NonExistentBackup");
+				}
+			}
+			else
+			{
+				throw new Exception("InvalidInput");
+			}
         }
 		/// <summary>
 		///     This method executes a task depending on the key input corresponding to a task
@@ -283,5 +307,19 @@ namespace Easysave.Controller
 				ExecuteTaskByKey(task.Key);
 			}
         }
+
+        private void SaveBackupTasks()
+        {
+            string backupTasksToJSON = JsonSerializer.Serialize(this.BackupTasks, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(SavePath, backupTasksToJSON);
+        }
+
+        private Dictionary<int, BackupModel> LoadBackupTasks()
+        {
+            string backupTasksJSON = File.ReadAllText(SavePath);
+            Dictionary<int, BackupModel> backupTasksFromJSON = JsonSerializer.Deserialize<Dictionary<int, BackupModel>>(backupTasksJSON);
+            return backupTasksFromJSON;
+        }
+
     }
 }

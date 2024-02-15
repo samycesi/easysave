@@ -1,11 +1,14 @@
 using System;
 using System.Globalization;
 using System.Resources;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text.RegularExpressions;
 using Easysave.Controller;
 using Easysave.Logger;
 using Easysave.Model;
+using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 
 namespace Easysave.View
@@ -87,8 +90,9 @@ namespace Easysave.View
                 Console.WriteLine($"2. {resourceManager.GetString("ListBackupJobs", cultureInfo)}");
                 Console.WriteLine($"3. {resourceManager.GetString("ExecuteBackupJob", cultureInfo)}");
                 Console.WriteLine($"4. {resourceManager.GetString("ExecuteAllBackupJobs", cultureInfo)}");
-                Console.WriteLine($"5. {resourceManager.GetString("ChangeLanguage", cultureInfo)}");
-                Console.WriteLine($"6. {resourceManager.GetString("Exit", cultureInfo)}");
+                Console.WriteLine($"5. {resourceManager.GetString("DeleteBackup", cultureInfo)}");
+                Console.WriteLine($"6. {resourceManager.GetString("ChangeLanguage", cultureInfo)}");
+                Console.WriteLine($"7. {resourceManager.GetString("Exit", cultureInfo)}");
 
                 Console.Write($"{resourceManager.GetString("SelectOption", cultureInfo)}: ");
                 var option = Console.ReadLine();
@@ -108,9 +112,12 @@ namespace Easysave.View
                         Console.WriteLine(resourceManager.GetString("AllJobsExecuted", cultureInfo));
                         break;
                     case "5":
-                        ChangeLanguage();
+                        DeleteBackupTask();
                         break;
                     case "6":
+                        ChangeLanguage();
+                        break;
+                    case "7":
                         keepRunning = false;
                         break;
                     default:
@@ -191,7 +198,7 @@ namespace Easysave.View
         {
             Console.WriteLine();
             Console.WriteLine(resourceManager.GetString("ListBackup", cultureInfo));
-            for (int i = 1; i <= 5; i++)
+            for (int i =BackupController.MinTask = 1; i <= BackupController.MaxTask; i++)
             {
                 if (backupController.BackupTasks.ContainsKey(i))
                 {
@@ -283,7 +290,35 @@ namespace Easysave.View
 
         public void DeleteBackupTask()
         {
+            Boolean validInput = false;
+            while (!validInput)
+            {
+                Console.WriteLine();
+                Console.WriteLine(resourceManager.GetString("EnterDeleteBackup", cultureInfo));
+                string userInput = Console.ReadLine();
+                switch (userInput)
+                {
+                    case "0":
+                        validInput = true;
+                        break;
+                    default:
+                        {
+                            try
+                            {
+                                this.backupController.DeleteBackupTask(userInput);
+                                // valid input
+                                validInput = true;
 
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(resourceManager.GetString(ex.Message, cultureInfo));
+                                break;
+                            }
+                        }
+                        break;
+                }
+            }
         }
 
         private string RequireValidPath(string messageLogPathKey)
