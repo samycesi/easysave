@@ -248,7 +248,7 @@ namespace easysave.Model
         private long EncryptFile(string sourceFile, string destinationFile)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"C:\Users\bilel\source\repos\cryptosoft\cryptosoft\bin\Release\net8.0\publish\cryptosoft.exe"; // Chemin de l'exécutable de chiffrement
+            startInfo.FileName = @"D:\DEV\easysave\CRYPTOSOFT\cryptosoft.exe"; // Chemin de l'exécutable de chiffrement
             startInfo.Arguments = $"\"{sourceFile}\" \"{destinationFile}.chiffre\""; // Fichier source et destination
             startInfo.RedirectStandardOutput = true;
             startInfo.UseShellExecute = false;
