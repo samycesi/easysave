@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Easysave.Logger
+namespace Easysave.Model.Logger
 {
     public class DailyLogger : Logger
     {
@@ -16,7 +16,6 @@ namespace Easysave.Logger
 
         public DailyLogger(string filePath) : base(filePath)
         {
-
         }
 
         public void WriteDailyLog(BackupModel model,long fileSize,long fileTransferTime)

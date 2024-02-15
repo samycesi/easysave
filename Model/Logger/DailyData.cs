@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Easysave.Logger
+namespace Easysave.Model.Logger
 {
     public class DailyData
     {

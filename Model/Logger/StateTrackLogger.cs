@@ -12,7 +12,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using Newtonsoft.Json;
 
 
-namespace Easysave.Logger
+namespace Easysave.Model.Logger
 {
     public class StateTrackLogger : Logger
     {
