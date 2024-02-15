@@ -16,8 +16,15 @@ namespace Easysave.Logger
 
         public DailyLogger(string filePath) : base(filePath)
         {
-
         }
+
+
+        // WriteDailyLogXML 
+/*
+ * 
+ * 
+ */
+        // WriteDailyLogJSON
 
         public void WriteDailyLog(BackupModel model,long fileSize,long fileTransferTime)
         {

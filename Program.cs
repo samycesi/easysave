@@ -13,7 +13,6 @@ class Program
         string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         string jsonFilePath = Path.Combine(solutionDir, "AppConfig.json");
 
-  
         string jsonContent = File.ReadAllText(jsonFilePath);
 
         AppConfigData appConfig = JsonConvert.DeserializeObject<AppConfigData>(jsonContent);
