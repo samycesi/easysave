@@ -10,6 +10,18 @@ namespace Easysave.Model
         [JsonProperty("DailyPath")]
         public string DailyPath { get; set; }
 
+        [JsonProperty("fileExtensionToEncrypt")]
+        public string FileExtensionToEncrypt { get; set; }
+
+        [JsonProperty("cryptosoftPath")]
+        public string CryptosoftPath { get; set; }
+
+        [JsonProperty("language")]
+        public string Language { get; set; }
+
+        [JsonProperty("businessSoftwarePath")]
+        public string BusinessSoftwarePath { get; set; }
+
         public AppConfigData(string stateTrackPath, string dailyPath)
         {
             this.StateTrackPath = stateTrackPath;
