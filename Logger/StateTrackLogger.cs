@@ -5,11 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using Newtonsoft.Json;
+using System.Xml.Serialization;
+using System.Text.Json;
+using System.Xml;
+using System.IO.Pipes;
 
 
 namespace Easysave.Logger
@@ -37,9 +38,24 @@ namespace Easysave.Logger
                 StateTrackData task = new StateTrackData("Save" + i.ToString(), DateTime.Now, "INACTIVE", 0, 0, 0, 0, "", "");
                 myDataList.Add(task);
             }
-            string json = JsonConvert.SerializeObject(myDataList, Formatting.Indented);
-            Console.WriteLine(this.FilePath);
-            File.WriteAllText(this.FilePath, json);
+
+
+            string fileType = Path.GetExtension(FilePath);
+            switch (fileType)
+            {
+                case ".xml":
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>));
+                    using (StringWriter writer = new StringWriter())
+                    {
+                        serializer.Serialize(writer, myDataList);
+                        File.WriteAllText(this.FilePath, writer.ToString());
+                    }
+                    break;
+                case ".json":
+                    string json = JsonSerializer.Serialize(myDataList, new JsonSerializerOptions { WriteIndented = true });
+                    File.WriteAllText(this.FilePath, json);
+                    break;
+            }
         }
 
         /// <summary>
@@ -57,7 +73,16 @@ namespace Easysave.Logger
             StateTrackData currentTask = new StateTrackData("Save" + key.ToString(), DateTime.Now, "ACTIVE",
                                                             totalFilesToCopy, totalFilesSize, filesLeftToDo, fileSizeLeftToDo,
                                                              sourceFileDirectory, targetFileDirectory);
-            Update(currentTask, key);
+            switch (Path.GetExtension(FilePath))
+            {
+                case ".xml":
+                    UpdateXML(currentTask, key);
+                    break;
+                case ".json":
+                    UpdateJSON(currentTask, key);
+                    break;
+            }
+           
         }
 
         /// <summary>
@@ -67,20 +92,72 @@ namespace Easysave.Logger
         public void UpdateInactive(int key)
         {
             StateTrackData currentTask = new StateTrackData("Save" + key.ToString(), DateTime.Now, "INACTIVE", 0, 0, 0, 0, "", "");
-            Update(currentTask, key);
+            switch (Path.GetExtension(FilePath))
+            {
+                case ".xml":
+                    UpdateXML(currentTask, key);
+                    break;
+                case ".json":
+                    UpdateJSON(currentTask, key);
+                    break;
+            }
         }
 
         /// <summary>
         ///     Deserializes the real time log file and writes updated state
         /// </summary>
         /// <param name="currentTask"></param>
-        private void Update(StateTrackData currentTask, int key)
+        private void UpdateJSON(StateTrackData currentTask, int key)
         {
-            string json = File.ReadAllText(this.FilePath);
-            List<StateTrackData> myDataList = JsonConvert.DeserializeObject<List<StateTrackData>>(json);
-            myDataList[key] = currentTask;
-            string updatedJson = JsonConvert.SerializeObject(myDataList, Formatting.Indented);
-            File.WriteAllText(this.FilePath, updatedJson);
+            if (File.Exists(FilePath))
+            {
+                string json = File.ReadAllText(this.FilePath);
+                List<StateTrackData> myDataList = JsonSerializer.Deserialize<List<StateTrackData>>(json);
+                myDataList[key] = currentTask;
+                string updatedJson = JsonSerializer.Serialize(myDataList, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(this.FilePath, updatedJson);
+            }
+            
         }
+
+        /// <summary>
+        ///     Deserializes the real time log file and writes updated state
+        /// </summary>
+        /// <param name="currentTask"></param>
+        private void UpdateXML(StateTrackData currentTask, int key)
+        {
+            List<StateTrackData> myDataList;
+            var serializer = new XmlSerializer(typeof(List<StateTrackData>));
+            if (File.Exists(FilePath))
+            {
+                using (var reader = new StreamReader(FilePath))
+                {
+                    myDataList = (List<StateTrackData>)serializer.Deserialize(reader);
+                    myDataList[key] = currentTask;
+                }
+                using (StringWriter writer = new StringWriter())
+                {
+                    serializer.Serialize(writer, myDataList);
+                    File.WriteAllText(this.FilePath, writer.ToString());
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }

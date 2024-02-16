@@ -198,6 +198,9 @@
   <data name="DeleteBackup" xml:space="preserve">
     <value>Delete a backup job</value>
   </data>
+  <data name="EnterLogFileType" xml:space="preserve">
+    <value>Please choose the type of the log file :</value>
+  </data>
   <data name="NonExistentBackup" xml:space="preserve">
     <value>No backup task corresponds to this index.</value>
   </data>

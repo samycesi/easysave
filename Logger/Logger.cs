@@ -30,7 +30,16 @@ namespace Easysave.Logger
         /// </summary>
         public void CreateFile()
         {
-            File.WriteAllText(this.FilePath, "{}");
+            switch (Path.GetExtension(FilePath))
+            {
+                case ".xml":
+                    File.WriteAllText(this.FilePath, "");
+                    break;
+                case ".json":
+                    File.WriteAllText(this.FilePath, "{}");
+                    break;
+            }
+            
         }
 
 
