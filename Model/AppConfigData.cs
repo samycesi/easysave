@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using System.IO;
+using System.Text.Json;
 
 namespace Easysave.Model
 {
@@ -22,10 +24,38 @@ namespace Easysave.Model
         [JsonProperty("businessSoftwarePath")]
         public string BusinessSoftwarePath { get; set; }
 
-        public AppConfigData(string stateTrackPath, string dailyPath)
+        private string jsonFilePath;
+        public AppConfigData()
         {
-            this.StateTrackPath = stateTrackPath;
-            this.DailyPath = dailyPath;
+            string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
+            jsonFilePath = Path.Combine(solutionDir, @"Config\AppConfig.json");
+            LoadFromFile();
+        }
+
+        private void LoadFromFile()
+        {
+            if (File.Exists(jsonFilePath))
+            {
+                string jsonString = File.ReadAllText(jsonFilePath);
+                var configData = JsonConvert.DeserializeObject<AppConfigData>(jsonString);
+
+                StateTrackPath = configData.StateTrackPath;
+                DailyPath = configData.DailyPath;
+                FileExtensionToEncrypt = configData.FileExtensionToEncrypt;
+                CryptosoftPath = configData.CryptosoftPath;
+                Language = configData.Language;
+                BusinessSoftwarePath = configData.BusinessSoftwarePath;
+            }
+            else
+            {
+                throw new FileNotFoundException("Le fichier JSON spécifié est introuvable.", jsonFilePath);
+            }
+        }
+
+        public void SaveToFile()
+        {
+            string jsonString = JsonConvert.SerializeObject(this, Formatting.Indented);
+            File.WriteAllText(jsonFilePath, jsonString);
         }
     }
 }
