@@ -23,7 +23,10 @@ namespace easysave.Model.Logger
         [JsonProperty("Time")]
         public DateTime Time { get; set; }
 
-        public DailyData(string name, string sourceDirectory, string destinationDirectory, long fileSize, long fileTransferTime, DateTime time)
+        [JsonProperty("TotalEncryptionTime")]
+        public long TotalEncryptionTime { get; set; }
+
+        public DailyData(string name, string sourceDirectory, string destinationDirectory, long fileSize, long fileTransferTime, long totalEncryptionTime, DateTime time)
         {
             this.Name = name;
             this.SourceDirectory = sourceDirectory;
@@ -31,6 +34,7 @@ namespace easysave.Model.Logger
             this.FileSize = fileSize;
             this.FileTransferTime = fileTransferTime;
             this.Time = time;
+            this.TotalEncryptionTime = totalEncryptionTime;
         }
     }
 }
