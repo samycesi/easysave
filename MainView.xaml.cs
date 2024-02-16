@@ -1,4 +1,5 @@
 ﻿using easysave.ViewModel;
+using Easysave.Model;
 using System.Globalization;
 using System.Resources;
 
@@ -16,6 +17,7 @@ namespace easysave
         // à implémenter
         public MainView()
         {
+            AppConfigData appConfigData = new AppConfigData();
         }
 
     }

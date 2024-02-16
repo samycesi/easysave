@@ -49,7 +49,7 @@ namespace easysave.Model
             string destinationDirectory = task.DestinationDirectory;
             BackupType backupType = task.Type;
 
-            string extension = ".txt"; // Extension to encrypt (change for the one in the configuration file)
+            string extension = App.appConfigData.FileExtensionToEncrypt; // Extension to encrypt (change for the one in the configuration file)
 
             var sourceDir = new DirectoryInfo(sourceDirectory);
             var destDir = new DirectoryInfo(destinationDirectory);
@@ -248,7 +248,7 @@ namespace easysave.Model
         private long EncryptFile(string sourceFile, string destinationFile)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"D:\DEV\easysave\CRYPTOSOFT\cryptosoft.exe"; // Chemin de l'exécutable de chiffrement
+            startInfo.FileName = $"\"{App.appConfigData.CryptosoftPath}\""; // Chemin de l'exécutable de chiffrement
             startInfo.Arguments = $"\"{sourceFile}\" \"{destinationFile}.chiffre\""; // Fichier source et destination
             startInfo.RedirectStandardOutput = true;
             startInfo.UseShellExecute = false;
