@@ -148,7 +148,7 @@
     <value>Exit</value>
   </data>
   <data name="Index" xml:space="preserve">
-    <value>Enter the index of the Backup Job to execute (for example 1-3 execute Backup Job 1, 2 and 3) : </value>
+    <value>Enter the index of the Backup Job to execute : </value>
   </data>
   <data name="InvalidIndex" xml:space="preserve">
     <value>Invalid index, please enter a valid number.</value>

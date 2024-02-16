@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Resources;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text.RegularExpressions;
-using Easysave.Controller;
+using Easysave.ViewModel;
 using Easysave.Logger;
 using Easysave.Model;
 using Microsoft.VisualBasic.FileIO;
@@ -15,7 +15,7 @@ namespace Easysave.View
 {
     public class ConsoleView
     {
-        private readonly BackupController backupController;
+        private readonly BackupViewModel backupViewModel;
         private ResourceManager resourceManager;
         private CultureInfo cultureInfo;
 
@@ -53,10 +53,13 @@ namespace Easysave.View
             // Update Config
             AppConfigData appConfig = new AppConfigData(stateTrackLogger.FilePath, dailyLogger.FilePath, logFileType);
             string updatedJson = JsonSerializer.Serialize(appConfig, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(BackupController.ConfigFilePath, updatedJson);
-            backupController = new BackupController(dailyLogger, stateTrackLogger);
+            File.WriteAllText(BackupViewModel.ConfigFilePath, updatedJson);
+            backupViewModel = new BackupViewModel(dailyLogger, stateTrackLogger);
         }
 
+        /// <summary>
+        ///     This method displays the view that allows to change the language
+        /// </summary>
         private void ChangeLanguage()
         {
             Console.WriteLine();
@@ -80,6 +83,9 @@ namespace Easysave.View
 
         }
 
+        /// <summary>
+        ///     This method displays the main menu
+        /// </summary>
         public void DisplayMenu()
         {
             bool keepRunning = true;
@@ -131,6 +137,9 @@ namespace Easysave.View
             }
         }
 
+        /// <summary>
+        ///     This method displays the view that allows to modify the log settings (path and type)
+        /// </summary>
         private void SettingsLogs()
         {
             bool keepRunning = true;
@@ -161,6 +170,9 @@ namespace Easysave.View
             }
         }
 
+        /// <summary>
+        ///     This method displays the view that allows to change the path of the logs
+        /// </summary>
         private void ChangeLogPaths()
         {
             Console.WriteLine(); 
@@ -172,27 +184,33 @@ namespace Easysave.View
             {
                 case "1":
                     Console.WriteLine();
-                    Console.WriteLine($"{resourceManager.GetString("CurrentPath", cultureInfo)}{Path.GetDirectoryName(backupController.DailyLogger.FilePath)}");
+                    Console.WriteLine($"{resourceManager.GetString("CurrentPath", cultureInfo)}{Path.GetDirectoryName(backupViewModel.DailyLogger.FilePath)}");
                     string dailyFolderPath = RequireValidPath("dailyPath");
-                    backupController.ChangeLogPath(dailyFolderPath, (LoggerModel) backupController.DailyLogger);
+                    backupViewModel.ChangeLogPath(dailyFolderPath, (LoggerModel)backupViewModel.DailyLogger);
                     break;
                 case "2":
                     Console.WriteLine();
-                    Console.WriteLine($"{resourceManager.GetString("CurrentPath", cultureInfo)}{Path.GetDirectoryName(backupController.StateTrackLogger.FilePath)}");
+                    Console.WriteLine($"{resourceManager.GetString("CurrentPath", cultureInfo)}{Path.GetDirectoryName(backupViewModel.StateTrackLogger.FilePath)}");
                     string stateTrackFolderPath = RequireValidPath("statePath");
-                    backupController.ChangeLogPath(stateTrackFolderPath, (LoggerModel)backupController.StateTrackLogger);
+                    backupViewModel.ChangeLogPath(stateTrackFolderPath, (LoggerModel)backupViewModel.StateTrackLogger);
                     break;
             }
         }
 
+        /// <summary>
+        ///     This method displays the view that allows to change the type of log files
+        /// </summary>
         private void ChangeLogTypes()
         {
             Console.WriteLine();
             string newLogFileType = ChooseLogFileType();
             // Update files
-            backupController.ChangeLogTypes(newLogFileType);
+            backupViewModel.ChangeLogTypes(newLogFileType);
         }
 
+        /// <summary>
+        ///     This method displays the view that allows to create a backup task
+        /// </summary>
         private void AddBackupTask()
         {
             Console.WriteLine();
@@ -245,20 +263,23 @@ namespace Easysave.View
             var typeInput = Console.ReadLine();
             BackupType type = (typeInput == "1") ? BackupType.Full : BackupType.Differential;
 
-            backupController.AddBackupTask(new BackupModel(name, sourceDirectory, targetDirectory, type));
+            backupViewModel.AddBackupTask(new BackupModel(name, sourceDirectory, targetDirectory, type));
             Console.WriteLine(resourceManager.GetString("BackupJobAddedSuccess", cultureInfo));
             Console.WriteLine();
         }
 
+        /// <summary>
+        ///     This method displays the current backup tasks
+        /// </summary>
         private void ListBackupTasks()
         {
             Console.WriteLine();
             Console.WriteLine(resourceManager.GetString("ListBackup", cultureInfo));
-            for (int i =BackupController.MinTask = 1; i <= BackupController.MaxTask; i++)
+            for (int i =BackupViewModel.MinTask = 1; i <= BackupViewModel.MaxTask; i++)
             {
-                if (backupController.BackupTasks.ContainsKey(i))
+                if (backupViewModel.BackupTasks.ContainsKey(i))
                 {
-                    Console.WriteLine($"{i}. {backupController.BackupTasks[i].Name}");
+                    Console.WriteLine($"{i}. {backupViewModel.BackupTasks[i].Name}");
                 }
                 else
                 {
@@ -267,11 +288,15 @@ namespace Easysave.View
             }
         }
 
+        /// <summary>
+        ///     This method displays the view that allows to execute many backup tasks
+        /// </summary>
         private void ExecuteBackupTasks()
         {
-            Regex uniqueJob = new Regex($@"[{BackupController.MinTask}-{BackupController.MaxTask}]", RegexOptions.IgnoreCase);
-            Regex toJob = new Regex($@"[{BackupController.MinTask}-{BackupController.MaxTask}]-[{BackupController.MinTask}-{BackupController.MaxTask}]", RegexOptions.IgnoreCase);
-            Regex andJob = new Regex($@"[{BackupController.MinTask}-{BackupController.MaxTask}];[{BackupController.MinTask}-{BackupController.MaxTask}]", RegexOptions.IgnoreCase);
+            Console.WriteLine();
+            Regex uniqueJob = new Regex($@"[{BackupViewModel.MinTask}-{BackupViewModel.MaxTask}]", RegexOptions.IgnoreCase);
+            Regex toJob = new Regex($@"[{BackupViewModel.MinTask}-{BackupViewModel.MaxTask}]-[{BackupViewModel.MinTask}-{BackupViewModel.MaxTask}]", RegexOptions.IgnoreCase);
+            Regex andJob = new Regex($@"[{BackupViewModel.MinTask}-{BackupViewModel.MaxTask}];[{BackupViewModel.MinTask}-{BackupViewModel.MaxTask}]", RegexOptions.IgnoreCase);
             Console.WriteLine(uniqueJob);
             bool validInput = false;
             do
@@ -281,51 +306,21 @@ namespace Easysave.View
                 if (uniqueJob.IsMatch(userInput) || toJob.IsMatch(userInput) || andJob.IsMatch(userInput))
                 {
                     validInput = true;
-                    this.backupController.ExecuteTasks(userInput);
+                    this.backupViewModel.ExecuteTasks(userInput);
                 }
                 else
                 {
                     Console.WriteLine($"{resourceManager.GetString("InvalidInput", cultureInfo)}, {resourceManager.GetString("PleaseEnterValidRange", cultureInfo)} (e.g., 1-3).");
                 }
             } while (!validInput);
-
-
-            /* var segments = userInput.Split(';');
-
-            foreach (var segment in segments)
-            {
-                if (segment.Contains("-"))
-                {
-                    var parts = segment.Split('-');
-                    if (parts.Length == 2 && int.TryParse(parts[0], out int start) && int.TryParse(parts[1], out int end) && start <= end)
-                    {
-                        for (int i = start; i <= end; i++)
-                        {
-                            //ExecuteSingleBackupJob(i - 1);
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"{resourceManager.GetString("InvalidRange", cultureInfo)} '{segment}', {resourceManager.GetString("PleaseEnterValidRange", cultureInfo)} (e.g., 1-3).");
-
-                    }
-                }
-                else if (int.TryParse(segment, out int index))
-                {
-                    //ExecuteSingleBackupJob(index - 1);
-                }
-                else
-                {
-                    Console.WriteLine($"Invalid input in segment '{segment}', please enter a number or a range (e.g., 1 or 1-3).");
-                }
-            } */
         }
-        //private void ExecuteSingleBackupJob(int jobIndex){}
 
-
+        /// <summary>
+        ///     This method executes all backup tasks
+        /// </summary>
         private void ExecuteAllBackupTasks()
         {
-            backupController.ExecuteAllTasks();
+            backupViewModel.ExecuteAllTasks();
             Console.WriteLine(resourceManager.GetString("AllJobsExecuted", cultureInfo));
         }
 
@@ -366,7 +361,7 @@ namespace Easysave.View
                         {
                             try
                             {
-                                this.backupController.DeleteBackupTask(userInput);
+                                this.backupViewModel.DeleteBackupTask(userInput);
                                 validInput = true;
 
                             }
@@ -402,12 +397,15 @@ namespace Easysave.View
             return folderPath;
         }
 
-
+        /// <summary>
+        ///     This method displays a view to select a file extension
+        /// </summary>
+        /// <returns></returns>
         public string ChooseLogFileType()
         {
             while (true)
             {
-                string fileTypesJSON = File.ReadAllText(BackupController.FileTypesPath);
+                string fileTypesJSON = File.ReadAllText(BackupViewModel.FileTypesPath);
                 List<string> listFileTypes = JsonSerializer.Deserialize<List<string>>(fileTypesJSON);
 
                 for (int i = 0; i < listFileTypes.Count; i++)
@@ -429,9 +427,6 @@ namespace Easysave.View
                 }
             }
         }
-
-
-
     }
 
 }
