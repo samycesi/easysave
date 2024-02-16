@@ -124,10 +124,10 @@
     <value>Backup job added successfully.</value>
   </data>
   <data name="ChangeLanguage" xml:space="preserve">
-    <value>Change Language</value>
+    <value>Change Language (en/fr)</value>
   </data>
   <data name="dailyPath" xml:space="preserve">
-    <value>Please enter the path for the daily backup :</value>
+    <value>Please enter the new path for the daily backup :</value>
   </data>
   <data name="EnterBackupJobName" xml:space="preserve">
     <value>Enter a name for your backup job : </value>
@@ -187,7 +187,7 @@
     <value>Please select an option</value>
   </data>
   <data name="statePath" xml:space="preserve">
-    <value>Please enter the path for the state backup : </value>
+    <value>Please enter the new path for the state backup : </value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to EasySave 1.0</value>
@@ -203,5 +203,32 @@
   </data>
   <data name="NonExistentBackup" xml:space="preserve">
     <value>No backup task corresponds to this index.</value>
+  </data>
+  <data name="ChangeLogPath" xml:space="preserve">
+    <value>Change the directory of log files</value>
+  </data>
+  <data name="SelectLog" xml:space="preserve">
+    <value>Select the file you want to modify :</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ChangeLogType" xml:space="preserve">
+    <value>Change the type of log files</value>
+  </data>
+  <data name="CurrentPath" xml:space="preserve">
+    <value>Current path : </value>
+  </data>
+  <data name="DailyLog" xml:space="preserve">
+    <value>Daily Log</value>
+  </data>
+  <data name="InvalidOption" xml:space="preserve">
+    <value>Invalid Option.</value>
+  </data>
+  <data name="SettingsLogs" xml:space="preserve">
+    <value>Change log files settings</value>
+  </data>
+  <data name="StateTrackLog" xml:space="preserve">
+    <value>State Track Log</value>
   </data>
 </root>

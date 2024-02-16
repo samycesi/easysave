@@ -1,1 +1,8 @@
-{}
+{
+  "1": {
+    "Name": "Test",
+    "SourceDirectory": "C:\\Users\\amals\\Documents\\EasySave\\TestSource",
+    "DestinationDirectory": "C:\\Users\\amals\\Documents\\EasySave\\TestDestination",
+    "Type": 0
+  }
+}

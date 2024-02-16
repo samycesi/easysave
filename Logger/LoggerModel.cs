@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace Easysave.Logger
 {
-    public class Logger
+    public class LoggerModel
     {
         public string FilePath { get; set; }
 
-        public Logger(string folderPath, string fileName)
+        public LoggerModel(string folderPath, string fileName)
         {
             string filePath = Path.Combine(folderPath, fileName);
             this.FilePath = filePath;
             CreateFile();
         }
 
-        public Logger(string filepath)
+        public LoggerModel(string filepath)
         {
             this.FilePath = filepath;
         }
@@ -39,7 +39,6 @@ namespace Easysave.Logger
                     File.WriteAllText(this.FilePath, "{}");
                     break;
             }
-            
         }
 
 
