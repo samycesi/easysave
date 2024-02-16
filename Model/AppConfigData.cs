@@ -10,16 +10,14 @@ namespace Easysave.Model
 {
     public class AppConfigData
     {
-        [JsonProperty("StateTrackPath")]
         public string StateTrackPath { get; set; }
-
-        [JsonProperty("DailyPath")]
         public string DailyPath { get; set; }
-
-        public AppConfigData(string stateTrackPath, string dailyPath)
+        public string LogFileType { get; set; }
+        public AppConfigData(string stateTrackPath, string dailyPath,string logFileType)
         {
             this.StateTrackPath = stateTrackPath;
             this.DailyPath = dailyPath;
+            this.LogFileType = logFileType;
         }
     }
 }

@@ -7,8 +7,12 @@ using Easysave.Controller;
 using Easysave.Logger;
 using Easysave.Model;
 using Microsoft.VisualBasic.FileIO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+
+using System.Net.Http.Json;
+using System.ComponentModel;
+
+
 
 
 namespace Easysave.View
@@ -19,7 +23,7 @@ namespace Easysave.View
         private ResourceManager resourceManager;
         private CultureInfo cultureInfo;
 
-        public ConsoleView(string stateTrackPath, string dailyPath)
+        public ConsoleView(string stateTrackPath, string dailyPath, string logFileType)
         {
             resourceManager = new ResourceManager("EasySave.View.Messages", typeof(ConsoleView).Assembly);
             cultureInfo = new CultureInfo("en");
@@ -27,33 +31,27 @@ namespace Easysave.View
             DailyLogger dailyLogger;
             StateTrackLogger stateTrackLogger;
 
-            if (dailyPath.Length == 0)
+            if (dailyPath.Length == 0 && stateTrackPath.Length == 0 && logFileType.Length == 0)
             {
                 string dailyFolderPath = RequireValidPath("dailyPath");
-                dailyLogger = new DailyLogger(dailyFolderPath, DateTime.Today.ToString("yyyy-MM-dd") + ".json");
+                string stateTrackFolderPath = RequireValidPath("statePath");
+                logFileType = ChooseLogFileType();
+
+
+                dailyLogger = new DailyLogger(dailyFolderPath, DateTime.Today.ToString("yyyy-MM-dd") + logFileType);
+                stateTrackLogger = new StateTrackLogger(stateTrackFolderPath, "state"+logFileType);
+
+
+                /// Update Config
+                AppConfigData appConfig = new AppConfigData(stateTrackLogger.FilePath, dailyLogger.FilePath, logFileType);
+                string updatedJson = JsonSerializer.Serialize(appConfig, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(BackupController.ConfigFilePath, updatedJson);
             }
             else
             {
                 dailyLogger = new DailyLogger(dailyPath);
-
-            }
-            if (stateTrackPath.Length == 0)
-            {
-                string stateTrackFolderPath = RequireValidPath("statePath");
-                stateTrackLogger = new StateTrackLogger(stateTrackFolderPath, "state.json");
-            }
-            else
-            {
                 stateTrackLogger = new StateTrackLogger(stateTrackPath);
             }
-            /// Update Config
-            string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
-            string jsonFilePath = Path.Combine(solutionDir, "AppConfig.json");
-            AppConfigData appConfig = new AppConfigData(stateTrackLogger.FilePath, dailyLogger.FilePath);
-            string updatedJson = JsonConvert.SerializeObject(appConfig, Formatting.Indented);
-            File.WriteAllText(jsonFilePath, updatedJson);
-
-
             backupController = new BackupController(dailyLogger, stateTrackLogger);
         }
 
@@ -213,13 +211,10 @@ namespace Easysave.View
 
         private void ExecuteBackupTasks()
         {
-
             Regex uniqueJob = new Regex($@"[{BackupController.MinTask}-{BackupController.MaxTask}]", RegexOptions.IgnoreCase);
             Regex toJob = new Regex($@"[{BackupController.MinTask}-{BackupController.MaxTask}]-[{BackupController.MinTask}-{BackupController.MaxTask}]", RegexOptions.IgnoreCase);
             Regex andJob = new Regex($@"[{BackupController.MinTask}-{BackupController.MaxTask}];[{BackupController.MinTask}-{BackupController.MaxTask}]", RegexOptions.IgnoreCase);
-
             Console.WriteLine(uniqueJob);
-
             bool validInput = false;
             do
             {
@@ -321,20 +316,51 @@ namespace Easysave.View
             }
         }
 
-        private string RequireValidPath(string messageLogPathKey)
+        private string RequireValidPath(string messageLogPath)
         {
-            Console.WriteLine($"{resourceManager.GetString(messageLogPathKey, cultureInfo)}");
+            Console.WriteLine($"{resourceManager.GetString(messageLogPath, cultureInfo)}");
             string folderPath = Console.ReadLine();
             Boolean pathIsValid = this.PathIsValid(folderPath);
             while (!pathIsValid)
             {
                 Console.WriteLine($"{resourceManager.GetString("InvalidPath", cultureInfo)}");
-                Console.WriteLine($"{resourceManager.GetString(messageLogPathKey, cultureInfo)}");
+                Console.WriteLine($"{resourceManager.GetString(messageLogPath, cultureInfo)}");
                 folderPath = Console.ReadLine();
                 pathIsValid = this.PathIsValid(folderPath);
             }
             return folderPath;
         }
+
+        public string ChooseLogFileType()
+        {
+            while (true)
+            {
+                Console.WriteLine($"{resourceManager.GetString("EnterLogFileType", cultureInfo)}");
+
+                string fileTypesJSON = File.ReadAllText(BackupController.FileTypesPath);
+                List<string> listFileTypes = JsonSerializer.Deserialize<List<string>>(fileTypesJSON);
+
+                for (int i = 0; i < listFileTypes.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {listFileTypes[i]}");
+                }
+
+                string userInput = Console.ReadLine();
+
+                if (int.TryParse(userInput, out int selectedIndex) && selectedIndex >= 1 && selectedIndex <= listFileTypes.Count)
+                {
+                    string logFileType = listFileTypes[selectedIndex - 1];
+                    return logFileType;
+                }
+                else
+                {
+                    Console.WriteLine($"{resourceManager.GetString("InvalidInput", cultureInfo)}");
+                }
+            }
+        }
+
+
+
     }
 
 }

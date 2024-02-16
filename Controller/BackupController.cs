@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
@@ -20,7 +22,9 @@ namespace Easysave.Controller
 	{
         public static int MinTask = 1;
         public static int MaxTask = 5;
-        private const string SavePath = "../../../Config/BackupSave.json";
+        public static string SavePath = "../../../Config/BackupSave.json";
+        public static string ConfigFilePath = "../../../Config/AppConfig.json";
+		public static string FileTypesPath = "../../../Config/FileTypes.json";
 
         public Dictionary<int, BackupModel> BackupTasks {  get; set; }
         public DailyLogger DailyLogger { get; set; }
@@ -126,6 +130,7 @@ namespace Easysave.Controller
 				throw new Exception("InvalidInput");
 			}
         }
+
 		/// <summary>
 		///     This method executes a task depending on the key input corresponding to a task
 		/// </summary>
@@ -215,7 +220,16 @@ namespace Easysave.Controller
 			}
 			stopwatch.Stop();
 			var duration = stopwatch.Elapsed;
-			DailyLogger.WriteDailyLog(task, totalBackupSize, duration.Milliseconds);
+
+            switch (Path.GetExtension(DailyLogger.FilePath))
+            {
+                case ".xml":
+                    DailyLogger.WriteDailyLogXML(task, totalBackupSize, duration.Milliseconds);
+                    break;
+                case ".json":
+                    DailyLogger.WriteDailyLogJSON(task, totalBackupSize, duration.Milliseconds);
+                    break;
+            }
 		}
 
 		/// <summary>
@@ -311,15 +325,21 @@ namespace Easysave.Controller
         private void SaveBackupTasks()
         {
             string backupTasksToJSON = JsonSerializer.Serialize(this.BackupTasks, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(SavePath, backupTasksToJSON);
+			if (File.Exists(SavePath))
+			{
+                File.WriteAllText(SavePath, backupTasksToJSON);
+            }
         }
 
         private Dictionary<int, BackupModel> LoadBackupTasks()
         {
-            string backupTasksJSON = File.ReadAllText(SavePath);
-            Dictionary<int, BackupModel> backupTasksFromJSON = JsonSerializer.Deserialize<Dictionary<int, BackupModel>>(backupTasksJSON);
-            return backupTasksFromJSON;
+			if (File.Exists(SavePath))
+			{
+                string backupTasksJSON = File.ReadAllText(SavePath);
+                Dictionary<int, BackupModel> backupTasksFromJSON = JsonSerializer.Deserialize<Dictionary<int, BackupModel>>(backupTasksJSON);
+                return backupTasksFromJSON;
+            }
+			return new Dictionary<int, BackupModel>();
         }
-
     }
 }

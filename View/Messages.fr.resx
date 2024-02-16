@@ -198,6 +198,9 @@
   <data name="DeleteBackup" xml:space="preserve">
     <value>Supprimer un travail de sauvegarde</value>
   </data>
+  <data name="EnterLogFileType" xml:space="preserve">
+    <value>Veuillez choisir le type du fichier log :</value>
+  </data>
   <data name="NonExistentBackup" xml:space="preserve">
     <value>Aucun travail de sauvegarde ne correspond à cet index.</value>
   </data>
