@@ -142,7 +142,7 @@
     <value>Execute all backup jobs</value>
   </data>
   <data name="ExecuteBackupJob" xml:space="preserve">
-    <value>Execute a backup job</value>
+    <value>Execute one or more backup jobs</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Exit</value>
