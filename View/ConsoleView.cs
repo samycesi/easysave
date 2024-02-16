@@ -8,12 +8,8 @@ using Easysave.Logger;
 using Easysave.Model;
 using Microsoft.VisualBasic.FileIO;
 using System.Text.Json;
-
 using System.Net.Http.Json;
 using System.ComponentModel;
-
-
-
 
 namespace Easysave.View
 {
@@ -40,18 +36,24 @@ namespace Easysave.View
 
                 dailyLogger = new DailyLogger(dailyFolderPath, DateTime.Today.ToString("yyyy-MM-dd") + logFileType);
                 stateTrackLogger = new StateTrackLogger(stateTrackFolderPath, "state"+logFileType);
-
-
-                /// Update Config
-                AppConfigData appConfig = new AppConfigData(stateTrackLogger.FilePath, dailyLogger.FilePath, logFileType);
-                string updatedJson = JsonSerializer.Serialize(appConfig, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(BackupController.ConfigFilePath, updatedJson);
             }
             else
             {
-                dailyLogger = new DailyLogger(dailyPath);
+                // new daily log file if date is different
+                if(String.Equals(Path.GetFileNameWithoutExtension(dailyPath), DateTime.Today.ToString("yyyy-MM-dd")))
+                {
+                    dailyLogger = new DailyLogger(dailyPath);
+                }
+                else
+                {
+                    dailyLogger = new DailyLogger(Path.GetDirectoryName(dailyPath), DateTime.Today.ToString("yyyy-MM-dd") + logFileType);
+                }
                 stateTrackLogger = new StateTrackLogger(stateTrackPath);
             }
+            // Update Config
+            AppConfigData appConfig = new AppConfigData(stateTrackLogger.FilePath, dailyLogger.FilePath, logFileType);
+            string updatedJson = JsonSerializer.Serialize(appConfig, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(BackupController.ConfigFilePath, updatedJson);
             backupController = new BackupController(dailyLogger, stateTrackLogger);
         }
 
@@ -89,8 +91,9 @@ namespace Easysave.View
                 Console.WriteLine($"3. {resourceManager.GetString("ExecuteBackupJob", cultureInfo)}");
                 Console.WriteLine($"4. {resourceManager.GetString("ExecuteAllBackupJobs", cultureInfo)}");
                 Console.WriteLine($"5. {resourceManager.GetString("DeleteBackup", cultureInfo)}");
-                Console.WriteLine($"6. {resourceManager.GetString("ChangeLanguage", cultureInfo)}");
-                Console.WriteLine($"7. {resourceManager.GetString("Exit", cultureInfo)}");
+                Console.WriteLine($"6. {resourceManager.GetString("SettingsLogs", cultureInfo)}");
+                Console.WriteLine($"7. {resourceManager.GetString("ChangeLanguage", cultureInfo)}");
+                Console.WriteLine($"8. {resourceManager.GetString("Exit", cultureInfo)}");
 
                 Console.Write($"{resourceManager.GetString("SelectOption", cultureInfo)}: ");
                 var option = Console.ReadLine();
@@ -113,9 +116,12 @@ namespace Easysave.View
                         DeleteBackupTask();
                         break;
                     case "6":
-                        ChangeLanguage();
+                        SettingsLogs();
                         break;
                     case "7":
+                        ChangeLanguage();
+                        break;
+                    case "8":
                         keepRunning = false;
                         break;
                     default:
@@ -126,19 +132,72 @@ namespace Easysave.View
             }
         }
 
-        public void ChangeLogPaths()
+        private void SettingsLogs()
         {
-            // case 1
+            bool keepRunning = true;
+            while (keepRunning)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"1. {resourceManager.GetString("ChangeLogPath", cultureInfo)}");
+                Console.WriteLine($"2. {resourceManager.GetString("ChangeLogType", cultureInfo)}");
+                Console.WriteLine($"3. {resourceManager.GetString("Cancel", cultureInfo)}");
+                Console.Write($"{resourceManager.GetString("SelectOption", cultureInfo)}: ");
+                var option = Console.ReadLine();
+                switch (option)
+                {
+                    case "1":
+                        ChangeLogPaths();
+                        break;
+                    case "2":
+                        ChangeLogTypes();
+                        break;
+                    case "3":
+                        keepRunning = false;
+                        break;
+                    default:
+                        Console.WriteLine(resourceManager.GetString("InvalidOption", cultureInfo));
+                        break;
+                }
 
-            // case 2
+            }
+        }
+
+        private void ChangeLogPaths()
+        {
+            Console.WriteLine(); 
+            Console.WriteLine($"1. {resourceManager.GetString("DailyLog", cultureInfo)}");
+            Console.WriteLine($"2. {resourceManager.GetString("StateTrackLog", cultureInfo)}");
+            Console.WriteLine(resourceManager.GetString("SelectLog", cultureInfo));
+            string input = Console.ReadLine();
+            switch (input)
+            {
+                case "1":
+                    Console.WriteLine();
+                    Console.WriteLine($"{resourceManager.GetString("CurrentPath", cultureInfo)}{Path.GetDirectoryName(backupController.DailyLogger.FilePath)}");
+                    string dailyFolderPath = RequireValidPath("dailyPath");
+                    backupController.ChangeLogPath(dailyFolderPath, (LoggerModel) backupController.DailyLogger);
+                    break;
+                case "2":
+                    Console.WriteLine();
+                    Console.WriteLine($"{resourceManager.GetString("CurrentPath", cultureInfo)}{Path.GetDirectoryName(backupController.StateTrackLogger.FilePath)}");
+                    string stateTrackFolderPath = RequireValidPath("statePath");
+                    backupController.ChangeLogPath(stateTrackFolderPath, (LoggerModel)backupController.StateTrackLogger);
+                    break;
+            }
+        }
+
+        private void ChangeLogTypes()
+        {
+            Console.WriteLine();
+            string newLogFileType = ChooseLogFileType();
+            // Update files
+            backupController.ChangeLogTypes(newLogFileType);
         }
 
         private void AddBackupTask()
         {
             Console.WriteLine();
-
             Console.WriteLine($"\n------ {resourceManager.GetString("MenuAddBackupJob", cultureInfo)} ------");
-
             Console.Write(resourceManager.GetString("EnterBackupJobName", cultureInfo));
             var name = Console.ReadLine();
 
@@ -301,7 +360,6 @@ namespace Easysave.View
                             try
                             {
                                 this.backupController.DeleteBackupTask(userInput);
-                                // valid input
                                 validInput = true;
 
                             }
@@ -335,8 +393,6 @@ namespace Easysave.View
         {
             while (true)
             {
-                Console.WriteLine($"{resourceManager.GetString("EnterLogFileType", cultureInfo)}");
-
                 string fileTypesJSON = File.ReadAllText(BackupController.FileTypesPath);
                 List<string> listFileTypes = JsonSerializer.Deserialize<List<string>>(fileTypesJSON);
 
@@ -344,6 +400,7 @@ namespace Easysave.View
                 {
                     Console.WriteLine($"{i + 1}. {listFileTypes[i]}");
                 }
+                Console.WriteLine($"{resourceManager.GetString("EnterLogFileType", cultureInfo)}");
 
                 string userInput = Console.ReadLine();
 

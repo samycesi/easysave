@@ -124,10 +124,10 @@
     <value>Le travail de sauvegarde a été crée avec succès.</value>
   </data>
   <data name="ChangeLanguage" xml:space="preserve">
-    <value>Changer de langue</value>
+    <value>Changer de langue (en/fr)</value>
   </data>
   <data name="dailyPath" xml:space="preserve">
-    <value>Entrez le chemin du fichier pour stocker le fichier de log journalier :</value>
+    <value>Entrez le nouveau chemin du fichier pour stocker le fichier de log journalier :</value>
   </data>
   <data name="EnterBackupJobName" xml:space="preserve">
     <value>Entrez le nom du travail de sauvegarde : </value>
@@ -187,7 +187,7 @@
     <value>Selectionnez une option</value>
   </data>
   <data name="statePath" xml:space="preserve">
-    <value>Entrez le fichier pour stocker le fichier de log en temps réel : </value>
+    <value>Entrez le nouveau chemin pour stocker le fichier de log en temps réel : </value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Bienvenue dans EasySave 1.0</value>
@@ -203,5 +203,32 @@
   </data>
   <data name="NonExistentBackup" xml:space="preserve">
     <value>Aucun travail de sauvegarde ne correspond à cet index.</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Retour</value>
+  </data>
+  <data name="ChangeLogPath" xml:space="preserve">
+    <value>Changer l'emplacement des fichiers log</value>
+  </data>
+  <data name="ChangeLogType" xml:space="preserve">
+    <value>Modifier le type des fichiers log</value>
+  </data>
+  <data name="CurrentPath" xml:space="preserve">
+    <value>Chemin actuel : </value>
+  </data>
+  <data name="DailyLog" xml:space="preserve">
+    <value>Fichier Journalier</value>
+  </data>
+  <data name="InvalidOption" xml:space="preserve">
+    <value>Option non valide.</value>
+  </data>
+  <data name="SelectLog" xml:space="preserve">
+    <value>Sélectionnez le fichier que vous souhaitez modifier :</value>
+  </data>
+  <data name="SettingsLogs" xml:space="preserve">
+    <value>Modifier les paramètres des fichiers log</value>
+  </data>
+  <data name="StateTrackLog" xml:space="preserve">
+    <value>Fichier Temps Réel</value>
   </data>
 </root>

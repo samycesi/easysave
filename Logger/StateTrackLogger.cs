@@ -15,7 +15,7 @@ using System.IO.Pipes;
 
 namespace Easysave.Logger
 {
-    public class StateTrackLogger : Logger
+    public class StateTrackLogger : LoggerModel
     {
         public StateTrackLogger(string folderPath,string filename) : base(folderPath,filename)
         {
@@ -143,17 +143,45 @@ namespace Easysave.Logger
             }
         }
 
+        public void ConvertXMLtoJSON()
+        {
+            List<StateTrackData> myDataList;
+            var serializer = new XmlSerializer(typeof(List<StateTrackData>));
+            if (File.Exists(FilePath))
+            {
+                // FROM XML 
+                using (var reader = new StreamReader(FilePath))
+                {
+                    myDataList = (List<StateTrackData>)serializer.Deserialize(reader);
+                }
+                File.Delete(FilePath);
+                // New File Path
+                FilePath = Path.ChangeExtension(FilePath, ".json");
+                // TO JSON
+                string convertedJSON = JsonSerializer.Serialize(myDataList, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(this.FilePath, convertedJSON);
+            }
+        }
 
-
-
-
-
-
-
-
-
-
-
+        public void ConvertJSONtoXML()
+        {
+            List<StateTrackData> myDataList;
+            var serializer = new XmlSerializer(typeof(List<StateTrackData>));
+            if (File.Exists(FilePath))
+            {
+                // FROM JSON
+                myDataList = JsonSerializer.Deserialize<List<StateTrackData>>(File.ReadAllText(this.FilePath));
+                File.Delete(FilePath);
+                // New File Path
+                FilePath = Path.ChangeExtension(FilePath, ".xml");
+                // TO XML
+                using (StringWriter writer = new StringWriter())
+                {
+                    serializer.Serialize(writer, myDataList);
+                    File.WriteAllText(this.FilePath, writer.ToString());
+                }
+            }
+        }
 
 
 

@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Easysave.Logger;
 using Easysave.Model;
 using Easysave.View;
@@ -236,10 +237,44 @@ namespace Easysave.Controller
 		///     This method changes the path to the log files
 		/// </summary>
 		/// <param name="path"></param>
-		public void ChangeLogPath(string path)
+		public void ChangeLogPath(string path, LoggerModel logger)
 		{
+			if(File.Exists(logger.FilePath))
+			{
+                string newFilePath = Path.Combine(path, Path.GetFileName(logger.FilePath));
+                File.WriteAllText(newFilePath, File.ReadAllText(logger.FilePath));
+                File.Delete(logger.FilePath);
+				logger.FilePath = newFilePath;
+				UpdateConfigLogs();
 
+            }
 		}
+
+		public void ChangeLogTypes(string newType)
+		{
+            //if (newType != Path.GetExtension(DailyLogger.FilePath) && newType != Path.GetExtension(DailyLogger.FilePath))
+			if(true)
+			{
+                switch (newType)
+                {
+                    case ".xml":
+                        // Daily Log
+                        DailyLogger.ConvertJSONtoXML();
+                        // StateTrackLog
+                        StateTrackLogger.ConvertJSONtoXML();
+                        break;
+                    case ".json":
+                        // Daily Log
+                        DailyLogger.ConvertXMLtoJSON();
+                        // StateTrackLog
+                        StateTrackLogger.ConvertXMLtoJSON();
+                        break;
+                }
+            }
+			// Update Config
+			UpdateConfigLogs();
+            UpdateConfigLogType(newType);
+        }
 
 		private (long size, int fileCount) CalculateTransferSize(BackupModel task)
 		{
@@ -340,6 +375,25 @@ namespace Easysave.Controller
                 return backupTasksFromJSON;
             }
 			return new Dictionary<int, BackupModel>();
+        }
+
+		public void UpdateConfigLogs()
+		{
+            string configString = File.ReadAllText(ConfigFilePath);
+            AppConfigData appConfig = JsonSerializer.Deserialize<AppConfigData>(configString);
+            appConfig.DailyPath = DailyLogger.FilePath;
+            appConfig.StateTrackPath = StateTrackLogger.FilePath;
+            string updatedJson = JsonSerializer.Serialize(appConfig, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(ConfigFilePath, updatedJson);
+        }
+
+        public void UpdateConfigLogType(string logType)
+        {
+            string configString = File.ReadAllText(ConfigFilePath);
+            AppConfigData appConfig = JsonSerializer.Deserialize<AppConfigData>(configString);
+			appConfig.LogFileType = logType;
+            string updatedJson = JsonSerializer.Serialize(appConfig, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(ConfigFilePath, updatedJson);
         }
     }
 }
