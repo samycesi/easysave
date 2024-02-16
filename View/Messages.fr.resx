@@ -148,7 +148,7 @@
     <value>Quitter</value>
   </data>
   <data name="Index" xml:space="preserve">
-    <value>Entrez l'index du travail de sauvegarde à executer (par exemple, 1-3 va executer les travaux 1, 2 et 3) :  </value>
+    <value>Entrez l'index du travail de sauvegarde à executer :  </value>
   </data>
   <data name="InvalidIndex" xml:space="preserve">
     <value>Index non valide. </value>
