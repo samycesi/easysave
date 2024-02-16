@@ -1,5 +1,5 @@
 {
-  "StateTrackPath": "",
-  "DailyPath": "",
-  "LogFileType": ""
+  "StateTrackPath": "C:\\Users\\amals\\Documents\\state.xml",
+  "DailyPath": "C:\\Users\\amals\\Documents\\2024-02-16.xml",
+  "LogFileType": ".xml"
 }

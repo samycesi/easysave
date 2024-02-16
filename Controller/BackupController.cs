@@ -249,11 +249,14 @@ namespace Easysave.Controller
 
             }
 		}
-
+		
+		/// <summary>
+		///		This method changes the type of the log files (xml or json)
+		/// </summary>
+		/// <param name="newType"></param>
 		public void ChangeLogTypes(string newType)
 		{
-            //if (newType != Path.GetExtension(DailyLogger.FilePath) && newType != Path.GetExtension(DailyLogger.FilePath))
-			if(true)
+            if (newType != Path.GetExtension(DailyLogger.FilePath) && newType != Path.GetExtension(DailyLogger.FilePath))
 			{
                 switch (newType)
                 {
@@ -276,6 +279,12 @@ namespace Easysave.Controller
             UpdateConfigLogType(newType);
         }
 
+		/// <summary>
+		///		This method calculates the transfer size
+		/// </summary>
+		/// <param name="task"></param>
+		/// <returns></returns>
+		/// <exception cref="DirectoryNotFoundException"></exception>
 		private (long size, int fileCount) CalculateTransferSize(BackupModel task)
 		{
 			long size = 0;
@@ -349,6 +358,9 @@ namespace Easysave.Controller
 			return (size, fileCount);
 		}
 
+		/// <summary>
+		///		This method executes all tasks
+		/// </summary>
         public void ExecuteAllTasks()
         {
             foreach (var task in BackupTasks)

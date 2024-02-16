@@ -109,8 +109,7 @@ namespace Easysave.View
                         ExecuteBackupTasks();
                         break;
                     case "4":
-                        //backupController.ExecuteAllBackupTask();
-                        Console.WriteLine(resourceManager.GetString("AllJobsExecuted", cultureInfo));
+                        ExecuteAllBackupTasks();
                         break;
                     case "5":
                         DeleteBackupTask();
@@ -327,9 +326,14 @@ namespace Easysave.View
         private void ExecuteAllBackupTasks()
         {
             backupController.ExecuteAllTasks();
-            /* Console.WriteLine(resourceManager.GetString("AllJobsExecuted", cultureInfo)); */
+            Console.WriteLine(resourceManager.GetString("AllJobsExecuted", cultureInfo));
         }
 
+        /// <summary>
+        ///     This method checks if the path given is valid (format and existing)
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private Boolean PathIsValid(string path)
         {
             if (Path.IsPathRooted(path)) // if format is valid
@@ -342,6 +346,9 @@ namespace Easysave.View
             return false;
         }
 
+        /// <summary>
+        ///     This method displays the view to delete a task 
+        /// </summary>
         public void DeleteBackupTask()
         {
             Boolean validInput = false;
@@ -374,6 +381,12 @@ namespace Easysave.View
             }
         }
 
+        /// <summary>
+        ///     This method display a view to ask for a path 
+        ///     And checks if it is valid
+        /// </summary>
+        /// <param name="messageLogPath"></param>
+        /// <returns></returns>
         private string RequireValidPath(string messageLogPath)
         {
             Console.WriteLine($"{resourceManager.GetString(messageLogPath, cultureInfo)}");
@@ -388,6 +401,7 @@ namespace Easysave.View
             }
             return folderPath;
         }
+
 
         public string ChooseLogFileType()
         {
