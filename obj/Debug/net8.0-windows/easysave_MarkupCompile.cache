@@ -4,16 +4,16 @@
 winexe
 C#
 .cs
-D:\DEV\easysave\obj\Debug\net8.0-windows\
+C:\Dev\CSharp\Easysave_v2\easysave\easysave\obj\Debug\net8.0-windows\
 easysave
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
-D:\DEV\easysave\App.xaml
+C:\Dev\CSharp\Easysave_v2\easysave\easysave\App.xaml
 1-967447173
 
 14-745525879
-199-1788039009
+199-2142576673
 MainView.xaml;
 
 False

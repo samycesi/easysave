@@ -9,7 +9,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="demarrer.png" />
+    <None Remove="executer.png" />
+    <None Remove="logo.png" />
+    <None Remove="parametres.png" />
+    <None Remove="plus.png" />
+    <None Remove="poubelle.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="demarrer.png" />
+    <Resource Include="executer.png" />
+    <Resource Include="logo.png" />
+    <Resource Include="parametres.png" />
+    <Resource Include="plus.png" />
+    <Resource Include="poubelle.png" />
   </ItemGroup>
 
 </Project>

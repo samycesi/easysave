@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DEV\\easysave\\easysave.csproj": {}
+    "C:\\Dev\\CSharp\\Easysave_v2\\easysave\\easysave\\easysave.csproj": {}
   },
   "projects": {
-    "D:\\DEV\\easysave\\easysave.csproj": {
+    "C:\\Dev\\CSharp\\Easysave_v2\\easysave\\easysave\\easysave.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DEV\\easysave\\easysave.csproj",
+        "projectUniqueName": "C:\\Dev\\CSharp\\Easysave_v2\\easysave\\easysave\\easysave.csproj",
         "projectName": "easysave",
-        "projectPath": "D:\\DEV\\easysave\\easysave.csproj",
-        "packagesPath": "C:\\Users\\bilel\\.nuget\\packages\\",
-        "outputPath": "D:\\DEV\\easysave\\obj\\",
+        "projectPath": "C:\\Dev\\CSharp\\Easysave_v2\\easysave\\easysave\\easysave.csproj",
+        "packagesPath": "C:\\Users\\sarac\\.nuget\\packages\\",
+        "outputPath": "C:\\Dev\\CSharp\\Easysave_v2\\easysave\\easysave\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\bilel\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\sarac\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -38,11 +38,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -73,7 +68,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
