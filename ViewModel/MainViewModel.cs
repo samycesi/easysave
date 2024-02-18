@@ -1,99 +1,112 @@
 using easysave.Model;
 using easysave.Model.Logger;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 
 namespace easysave.ViewModel
 {
 
-    public class MainViewModel
+    public class MainViewModel : INotifyPropertyChanged
     {
 
-        public BackupList BackupList { get; set; }
-
-        public DailyLogger DailyLogger { get; set; }
-
-        public StateTrackLogger StateTrackLogger { get; set; }
-
-        public MainViewModel(DailyLogger dailyLogger, StateTrackLogger stateTrackLogger)
+        private ObservableCollection<BackupTaskViewModel> backupTaskViewModels;
+        public ObservableCollection<BackupTaskViewModel> BackupTaskViewModels
         {
-            this.BackupList = new BackupList();
-            this.DailyLogger = dailyLogger;
-            this.StateTrackLogger = stateTrackLogger;
-        }
-
-        /// <summary>
-        /// Change the path of the log file
-        /// </summary>
-        /// <param name="path"></param>
-        public void ChangeLogPath(string path)
-        {
-
-        }
-
-        /// <summary>
-        /// Execute the tasks depending on the command given by the user (can be a single task, a range of tasks or a list of tasks)
-        /// </summary>
-        /// <param name="command"></param>
-        public void ExecuteTasks(string command)
-        {
-            if (command.Contains("-"))
+            get { return backupTaskViewModels; }
+            set
             {
-                string[] tasks = command.Split('-');
-                int start = int.Parse(tasks[0]);
-                int end = int.Parse(tasks[1]);
-
-                for (int i = start; i <= end; i++)
-                {
-                    (BackupModel task, long fileSize, long fileTransferTime, long totalEncryptionTime) = BackupList.ExecuteTaskByKey(i, StateTrackLogger);
-                    DailyLogger.WriteDailyLog(task, fileSize, fileTransferTime, totalEncryptionTime);
-                }
+                backupTaskViewModels = value;
+                OnPropertyChanged();
             }
-            else if (command.Contains(";"))
+        }
+
+        public static BackupList BackupList { get; set; }
+        public static DailyLogger DailyLogger { get; set; }
+        public static StateTrackLogger StateTrackLogger { get; set; }
+
+        public RelayCommand HomeViewCommand { get; }
+        public RelayCommand CreateSaveViewCommand { get; }
+        public RelayCommand TasksViewCommand { get; }
+        public RelayCommand SettingsViewCommand { get; }
+
+        public HomeViewModel HomeVM { get; set; }
+        public CreateTaskViewModel CreateTaskVM { get; set; }
+        public TaskViewModel TaskVM { get; set; }
+        public SettingsViewModel SettingsVM { get; set; }
+
+        private object currentView;
+        public object CurrentView
+        {
+            get { return currentView; }
+            set
             {
-                string[] tasks = command.Split(';');
-                foreach (string taskKey in tasks)
-                {
-                    int key = int.Parse(taskKey);
-                    (BackupModel task, long fileSize, long fileTransferTime, long totalEncryptionTime) = BackupList.ExecuteTaskByKey(key, StateTrackLogger);
-                    DailyLogger.WriteDailyLog(task, fileSize, fileTransferTime, totalEncryptionTime);
-                }
+                currentView = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public MainViewModel()
+        {
+            BackupList = new BackupList();
+
+            DailyLogger = new DailyLogger(App.appConfigData.DailyPath, DateTime.Today.ToString("yyyy-MM-dd") + App.appConfigData.LogExtension);
+            StateTrackLogger = new StateTrackLogger(App.appConfigData.StateTrackPath, "state" + App.appConfigData.LogExtension, BackupList);
+
+            BackupTaskViewModels = new ObservableCollection<BackupTaskViewModel>(
+                BackupList.BackupTasks.Select(task => new BackupTaskViewModel(task.Key, task.Value))
+            );
+
+            HomeViewCommand = new RelayCommand(o => { ChangeView(HomeVM); });
+            CreateSaveViewCommand = new RelayCommand(o => { ChangeView(CreateTaskVM); });
+            TasksViewCommand = new RelayCommand(o => { ChangeView(TaskVM); });
+            SettingsViewCommand = new RelayCommand(o => { ChangeView(SettingsVM); });
+
+            HomeVM = new HomeViewModel();
+            CreateTaskVM = new CreateTaskViewModel(BackupTaskViewModels);
+            TaskVM = new TaskViewModel(BackupTaskViewModels);
+            SettingsVM = new SettingsViewModel(DailyLogger, StateTrackLogger);
+
+
+            if (!IsPathsValid())
+            {
+                CurrentView = SettingsVM;
             }
             else
             {
-                int key = int.Parse(command);
-                (BackupModel task, long fileSize, long fileTransferTime, long totalEncryptionTime) = BackupList.ExecuteTaskByKey(key, StateTrackLogger);
-                DailyLogger.WriteDailyLog(task, fileSize, fileTransferTime, totalEncryptionTime);
+                CurrentView = HomeVM;
             }
         }
 
-        /// <summary>
-        /// Add a new backup task to the list
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="sourceDirectory"></param>
-        /// <param name="destinationDirectory"></param>
-        /// <param name="type"></param>
-        public void AddBackupTask(string name, string sourceDirectory, string destinationDirectory, BackupType type)
+        private void ChangeView(object view)
         {
-            BackupModel newTask = new BackupModel(name, sourceDirectory, destinationDirectory, type);
-            BackupList.AddBackupTask(newTask);
-        }
-
-        /// <summary>
-        /// Delete a backup task from the list
-        /// </summary>
-        /// <param name="key"></param>
-        public void DeleteBackupTask(int key)
-        {
-            BackupList.DeleteBackupTask(key);
-        }
-
-        public void ExecuteAllTasks()
-        {
-            List<(BackupModel task, long fileSize, long fileTransferTime, long totalEncryptionTime)> results = BackupList.ExecuteAllTasks(StateTrackLogger);
-            foreach ((BackupModel task, long fileSize, long fileTransferTime, long totalEncryptionTime) in results)
+            if (IsPathsValid())
             {
-                DailyLogger.WriteDailyLog(task, fileSize, fileTransferTime, totalEncryptionTime);
+                CurrentView = view;
             }
+        }
+
+        private bool IsPathsValid()
+        {
+            Console.WriteLine(App.appConfigData.DailyPath);
+            Console.WriteLine(App.appConfigData.StateTrackPath);
+            Console.WriteLine(Directory.Exists(App.appConfigData.DailyPath));
+            Console.WriteLine(Directory.Exists(App.appConfigData.StateTrackPath));
+            return (Directory.Exists(App.appConfigData.DailyPath) && Directory.Exists(App.appConfigData.StateTrackPath)) || File.Exists(App.appConfigData.DailyPath) || File.Exists(App.appConfigData.StateTrackPath);
         }
 
     }

@@ -1,0 +1,28 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+
+    <system:String x:Key="Welcome">Bienvenue sur EasySave</system:String>
+    <system:String x:Key="Home">Accueil</system:String>
+    <system:String x:Key="Create">Créer un travail</system:String>
+    <system:String x:Key="Jobs">Travaux de sauvegarde</system:String>
+    <system:String x:Key="Setting">Parametres</system:String>
+    <system:String x:Key="Name">Nom</system:String>
+    <system:String x:Key="Browse">Parcourir</system:String>
+    <system:String x:Key="Source">Répertoire source</system:String>
+    <system:String x:Key="Destination">Répertoire cible</system:String>
+    <system:String x:Key="TypeOfBackup">Type de sauvegarde</system:String>
+    <system:String x:Key="Full">Complète</system:String>
+    <system:String x:Key="Differential">Différentielle</system:String>
+    <system:String x:Key="Langage">Choisir une langue</system:String>
+    <system:String x:Key="CreateTask">Créer</system:String>
+    <system:String x:Key="Start">Commencer</system:String>
+    <system:String x:Key="Select">Sélectionner</system:String>
+    <system:String x:Key="Delete">Supprimer la sélection</system:String>
+    <system:String x:Key="Refresh">Rafraichir</system:String>
+    <system:String x:Key="Execute">Executer la sélection</system:String>
+    <system:String x:Key="DailyPath">Chemin du fichier de log journalier</system:String>
+    <system:String x:Key="StatePath">Chemin du fichier de log en temps réel</system:String>
+    <system:String x:Key="Save">Enregistrer</system:String>
+
+</ResourceDictionary>

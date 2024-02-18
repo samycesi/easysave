@@ -2,8 +2,29 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:easysave"
+             xmlns:viewModel="clr-namespace:easysave.ViewModel"
+             xmlns:view="clr-namespace:easysave.View"
              StartupUri="MainView.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/MenuStyle.xaml"/>
+                <ResourceDictionary Source="Languages/textResources_fr.xaml"/>
+                <ResourceDictionary Source="Languages/textResources_en.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate DataType="{x:Type viewModel:HomeViewModel}">
+                <view:HomeWindow/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModel:CreateTaskViewModel}">
+                <view:CreateTaskWindow/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModel:TaskViewModel}">
+                <view:TasksWindow/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModel:SettingsViewModel}">
+                <view:SettingsWindow/>
+            </DataTemplate>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

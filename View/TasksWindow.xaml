@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="easysave.View.TasksWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:easysave.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    <StackPanel>
+        <ListView ItemsSource="{Binding BackupTasks}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="{DynamicResource Select}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="{DynamicResource Name}" DisplayMemberBinding="{Binding Backup.Name}" Width="120"/>
+                    <GridViewColumn Header="{DynamicResource Source}" DisplayMemberBinding="{Binding Backup.SourceDirectory}" Width="150"/>
+                    <GridViewColumn Header="{DynamicResource Destination}" DisplayMemberBinding="{Binding Backup.DestinationDirectory}" Width="150"/>
+                    <GridViewColumn Header="{DynamicResource TypeOfBackup}" DisplayMemberBinding="{Binding Backup.Type}" Width="100"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button Content="{DynamicResource Execute}" Command="{Binding ExecuteBackupCommand}" Margin="5"/>
+        <Button Content="{DynamicResource Delete}" Command="{Binding DeleteBackupCommand}" Margin="5"/>
+        <Button Content="{DynamicResource Refresh}" Command="{Binding RefreshCommand}" Margin="5"/>
+    </StackPanel>
+</UserControl>

@@ -6,16 +6,14 @@ namespace easysave.Model.Logger
     {
         public string FilePath { get; set; }
 
+        public string FolderPath { get; set; }
+
         public Logger(string folderPath, string fileName)
         {
+            this.FolderPath = folderPath;
             string filePath = Path.Combine(folderPath, fileName);
             this.FilePath = filePath;
             CreateFile();
-        }
-
-        public Logger(string filepath)
-        {
-            this.FilePath = filepath;
         }
 
         /// <summary>
@@ -24,7 +22,15 @@ namespace easysave.Model.Logger
         /// </summary>
         public void CreateFile()
         {
-            File.WriteAllText(this.FilePath, "{}");
+            switch (Path.GetExtension(FilePath))
+            {
+                case ".xml":
+                    File.WriteAllText(this.FilePath, "");
+                    break;
+                case ".json":
+                    File.WriteAllText(this.FilePath, "{}");
+                    break;
+            }
         }
 
 

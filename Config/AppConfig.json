@@ -1,8 +1,10 @@
 {
-  "StateTrackPath": "",
-  "DailyPath": "",
+  "stateTrackPath": "",
+  "dailyPath": "",
   "fileExtensionToEncrypt": "",
-  "cryptosoftPath": "",
+  "cryptosoftPath": "D:\\DEV\\easysave\\CRYPTOSOFT\\cryptosoft.exe",
   "language": "fr",
-  "businessSoftwarePath": ""
+  "businessSoftwarePath": "",
+  "logExtension": ".json",
+  "SavesPath": "D:\\DEV\\easysave\\Config\\TasksSave.json"
 }
