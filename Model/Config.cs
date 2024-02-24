@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Easysave.Model
+namespace easysave.Model
 {
 	public class Config
 	{

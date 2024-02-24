@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 
-namespace Easysave.Model
+namespace easysave.Model
 {
     public class AppConfigData
     {
