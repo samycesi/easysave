@@ -7,23 +7,31 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
     <StackPanel>
-        <ListView ItemsSource="{Binding BackupTasks}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="{DynamicResource Select}">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="{DynamicResource Name}" DisplayMemberBinding="{Binding Backup.Name}" Width="120"/>
-                    <GridViewColumn Header="{DynamicResource Source}" DisplayMemberBinding="{Binding Backup.SourceDirectory}" Width="150"/>
-                    <GridViewColumn Header="{DynamicResource Destination}" DisplayMemberBinding="{Binding Backup.DestinationDirectory}" Width="150"/>
-                    <GridViewColumn Header="{DynamicResource TypeOfBackup}" DisplayMemberBinding="{Binding Backup.Type}" Width="100"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="300">
+            <ListView ItemsSource="{Binding BackupTasks}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="{DynamicResource Select}">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="{DynamicResource Name}" DisplayMemberBinding="{Binding Backup.Name}" Width="120"/>
+                        <GridViewColumn Header="{DynamicResource Source}" DisplayMemberBinding="{Binding Backup.SourceDirectory}" Width="150"/>
+                        <GridViewColumn Header="{DynamicResource Destination}" DisplayMemberBinding="{Binding Backup.DestinationDirectory}" Width="150"/>
+                        <GridViewColumn Header="{DynamicResource TypeOfBackup}" DisplayMemberBinding="{Binding Backup.Type}" Width="100"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </ScrollViewer>
+
+        <TextBox Style="{StaticResource TerminalTextBoxStyle}" 
+                 Text="{Binding ConsoleOutput, UpdateSourceTrigger=PropertyChanged}" 
+                 Height="200" 
+                 Margin="5"/>
+
         <Button Content="{DynamicResource Execute}" Command="{Binding ExecuteBackupCommand}" Margin="5"/>
         <Button Content="{DynamicResource Delete}" Command="{Binding DeleteBackupCommand}" Margin="5"/>
         <Button Content="{DynamicResource Refresh}" Command="{Binding RefreshCommand}" Margin="5"/>

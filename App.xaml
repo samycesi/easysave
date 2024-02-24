@@ -11,6 +11,7 @@
                 <ResourceDictionary Source="Styles/MenuStyle.xaml"/>
                 <ResourceDictionary Source="Languages/textResources_fr.xaml"/>
                 <ResourceDictionary Source="Languages/textResources_en.xaml"/>
+                <ResourceDictionary Source="Styles/TerminalStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type viewModel:HomeViewModel}">

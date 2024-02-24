@@ -42,8 +42,6 @@ namespace easysave.Model
         {
             BackupTaskRemoved?.Invoke(this, new BackupEvent(this.BackupTasks[key])); // Notify that a backup task has been removed
             this.BackupTasks.Remove(key);
-            ReorderKeys(); // Reorder the keys of the backup tasks
-            SaveBackupTasks(); // Save the backup tasks to the save file
         }
 
         /// <summary>
@@ -293,7 +291,7 @@ namespace easysave.Model
         /// <summary>
         /// Reorder the keys of the backup tasks
         /// </summary>
-        private void ReorderKeys()
+        public void ReorderKeys()
         {
             int newKey = 1;
             Dictionary<int, BackupModel> reordenedBackupTasks = new Dictionary<int, BackupModel>();
@@ -311,6 +309,7 @@ namespace easysave.Model
             {
                 BackupTasks.Add(kvp.Key, kvp.Value);
             }
+            SaveBackupTasks(); // Save the backup tasks to the save file
         }
 
         /// <summary>

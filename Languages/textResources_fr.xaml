@@ -24,5 +24,6 @@
     <system:String x:Key="DailyPath">Chemin du fichier de log journalier</system:String>
     <system:String x:Key="StatePath">Chemin du fichier de log en temps réel</system:String>
     <system:String x:Key="Save">Enregistrer</system:String>
+    <system:String x:Key="SuccessfullyCreated">Travail de sauvegarde crée avec succès</system:String>
 
 </ResourceDictionary>

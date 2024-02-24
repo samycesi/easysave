@@ -3,8 +3,8 @@
   "dailyPath": "",
   "fileExtensionToEncrypt": "",
   "cryptosoftPath": "D:\\DEV\\easysave\\CRYPTOSOFT\\cryptosoft.exe",
-  "language": "fr",
+  "language": "en",
   "businessSoftwarePath": "",
   "logExtension": ".json",
-  "SavesPath": "D:\\DEV\\easysave\\Config\\TasksSave.json"
+  "savesPath": "D:\\DEV\\easysave\\Config\\TasksSave.json"
 }

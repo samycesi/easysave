@@ -14,7 +14,7 @@
                    FontSize="50"
                    Foreground="Black"
                    FontWeight="Medium"
-                   Width="286" Height="134" TextWrapping="WrapWithOverflow" Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                   Width="320" Height="134" TextWrapping="WrapWithOverflow" Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
         </StackPanel>
 
         <!-- Button -->

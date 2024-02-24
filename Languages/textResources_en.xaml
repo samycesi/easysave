@@ -24,5 +24,6 @@
     <system:String x:Key="DailyPath">Daily log path</system:String>
     <system:String x:Key="StatePath">Real-time log path</system:String>
     <system:String x:Key="Save">Save</system:String>
+    <system:String x:Key="SuccessfullyCreated">Task created successfully</system:String>
 
 </ResourceDictionary>

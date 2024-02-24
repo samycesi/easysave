@@ -2,8 +2,9 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
+using System.Threading;
 using System.Windows.Forms;
+using Timer = System.Threading.Timer;
 
 namespace easysave.ViewModel
 {
@@ -13,28 +14,39 @@ namespace easysave.ViewModel
         public string NewBackupName
         {
             get { return newBackupName; }
-            set { newBackupName = value; NotifyPropertyChanged(); }
+            set { newBackupName = value; OnPropertyChanged(); }
         }
 
         private string newBackupSource;
         public string NewBackupSource
         {
             get { return newBackupSource; }
-            set { newBackupSource = value; NotifyPropertyChanged(); }
+            set { newBackupSource = value; OnPropertyChanged(); }
         }
 
         private string newBackupDestination;
         public string NewBackupDestination
         {
             get { return newBackupDestination; }
-            set { newBackupDestination = value; NotifyPropertyChanged(); }
+            set { newBackupDestination = value; OnPropertyChanged(); }
         }
 
         private string newBackupType;
         public string NewBackupType
         {
             get { return newBackupType; }
-            set { newBackupType = value; NotifyPropertyChanged(); }
+            set { newBackupType = value; OnPropertyChanged(); }
+        }
+
+        private bool _isTaskCreatedSuccessfully;
+        public bool IsTaskCreatedSuccessfully
+        {
+            get { return _isTaskCreatedSuccessfully; }
+            set
+            {
+                _isTaskCreatedSuccessfully = value;
+                OnPropertyChanged();
+            }
         }
 
         private BackupList backupList;
@@ -45,7 +57,7 @@ namespace easysave.ViewModel
         public RelayCommand BrowseSourceCommand { get; }
         public RelayCommand BrowseDestinationCommand { get; }
         public RelayCommand AddBackupCommand { get; }
-        
+
         public CreateTaskViewModel(ObservableCollection<BackupTaskViewModel> backupTaskViewModels)
         {
             this.backupTaskViewModels = backupTaskViewModels;
@@ -95,7 +107,7 @@ namespace easysave.ViewModel
         /// <param name="parameter"></param>
         private void AddBackup(object parameter)
         {
-            BackupType backupType = NewBackupType.Contains("Full") || NewBackupType.Contains("Complète")? BackupType.Full : BackupType.Differential; // Set the backup type
+            BackupType backupType = NewBackupType.Contains("Full") || NewBackupType.Contains("Complète") ? BackupType.Full : BackupType.Differential; // Set the backup type
             var newBackup = new BackupModel(NewBackupName, NewBackupSource, NewBackupDestination, backupType); // Create a new backup
 
             // Add new backup to the backup list
@@ -107,6 +119,15 @@ namespace easysave.ViewModel
             // Add the new BackupTaskViewModel to the collection
             backupTaskViewModels.Add(newBackupTaskViewModel);
 
+            // Set IsTaskCreatedSuccessfully to true to show the success message
+            IsTaskCreatedSuccessfully = true;
+
+            // Start a timer to reset the success message visibility after 3 seconds
+            Timer timer = new Timer((state) =>
+            {
+                IsTaskCreatedSuccessfully = false;
+            }, null, 2000, Timeout.Infinite);
+
             // Reset input values after adding
             NewBackupName = "";
             NewBackupSource = "";
@@ -115,9 +136,10 @@ namespace easysave.ViewModel
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
     }
 }

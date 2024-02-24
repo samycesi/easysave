@@ -1,15 +1,11 @@
 using easysave.Model;
 using easysave.Model.Logger;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 
 namespace easysave.ViewModel
 {
@@ -76,20 +72,12 @@ namespace easysave.ViewModel
             TasksViewCommand = new RelayCommand(o => { ChangeView(TaskVM); });
             SettingsViewCommand = new RelayCommand(o => { ChangeView(SettingsVM); });
 
-            HomeVM = new HomeViewModel();
+            HomeVM = new HomeViewModel(this);
             CreateTaskVM = new CreateTaskViewModel(BackupTaskViewModels);
             TaskVM = new TaskViewModel(BackupTaskViewModels);
             SettingsVM = new SettingsViewModel(DailyLogger, StateTrackLogger);
 
-
-            if (!IsPathsValid())
-            {
-                CurrentView = SettingsVM;
-            }
-            else
-            {
-                CurrentView = HomeVM;
-            }
+            CurrentView = HomeVM;
         }
 
         private void ChangeView(object view)
@@ -97,6 +85,9 @@ namespace easysave.ViewModel
             if (IsPathsValid())
             {
                 CurrentView = view;
+            } else
+            {
+                CurrentView = SettingsVM;
             }
         }
 
