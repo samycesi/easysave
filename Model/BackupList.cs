@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
 using easysave.Model.Logger;
 
 namespace easysave.Model
@@ -10,9 +14,12 @@ namespace easysave.Model
 
         public Dictionary<int, BackupModel> BackupTasks { get; set; }
 
+        public event EventHandler<BackupEvent> BackupTaskAdded;
+        public event EventHandler<BackupEvent> BackupTaskRemoved;
+
         public BackupList()
         {
-            this.BackupTasks = new Dictionary<int, BackupModel>();
+            this.BackupTasks = LoadBackupTasks();
         }
 
         /// <summary>
@@ -23,6 +30,8 @@ namespace easysave.Model
         {
             int lastKey = this.BackupTasks.Keys.LastOrDefault();
             this.BackupTasks.Add(lastKey + 1, backup);
+            SaveBackupTasks(); // Save the backup tasks to the save file
+            BackupTaskAdded?.Invoke(this, new BackupEvent(backup)); // Notify that a backup task has been added
         }
 
         /// <summary>
@@ -31,8 +40,8 @@ namespace easysave.Model
         /// <param name="key"></param>
         public void DeleteBackupTask(int key)
         {
+            BackupTaskRemoved?.Invoke(this, new BackupEvent(this.BackupTasks[key])); // Notify that a backup task has been removed
             this.BackupTasks.Remove(key);
-            ReorderKeys();
         }
 
         /// <summary>
@@ -49,7 +58,7 @@ namespace easysave.Model
             string destinationDirectory = task.DestinationDirectory;
             BackupType backupType = task.Type;
 
-            string extension = App.appConfigData.FileExtensionToEncrypt; // Extension to encrypt (change for the one in the configuration file)
+            string extension = App.appConfigData.FileExtensionToEncrypt;
 
             var sourceDir = new DirectoryInfo(sourceDirectory);
             var destDir = new DirectoryInfo(destinationDirectory);
@@ -86,7 +95,7 @@ namespace easysave.Model
             long fileSizeLeftToDo = totalBackupSize;
 
             // Update the state of the task to active
-            stateTrackLogger.UpdateActive(totalFileCount, totalBackupSize, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory, key);
+            stateTrackLogger.UpdateActive(totalFileCount, totalBackupSize, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory, task.Name);
 
             while (stack.Count > 0)
             {
@@ -131,7 +140,7 @@ namespace easysave.Model
                         totalEncryptionTime += encryptionDuration;
                         filesLeftToDo--;
                         fileSizeLeftToDo -= file.Length;
-                        stateTrackLogger.UpdateActive(totalFileCount, totalBackupSize, filesLeftToDo, fileSizeLeftToDo, Path.Combine(currentSource.FullName, file.Name), targetFilePath, key);
+                        stateTrackLogger.UpdateActive(totalFileCount, totalBackupSize, filesLeftToDo, fileSizeLeftToDo, Path.Combine(currentSource.FullName, file.Name), targetFilePath, task.Name);
                     }
                 }
 
@@ -144,20 +153,21 @@ namespace easysave.Model
             }
             stopwatch.Stop();
             var duration = stopwatch.Elapsed;
-            return (task, totalBackupSize, duration.Milliseconds, totalEncryptionTime);
+            return (task, totalBackupSize, duration.Milliseconds, totalEncryptionTime); // Return the task, the total size of the backup, the duration of the backup and the total time of encryption for the DailyLogger
         }
 
         /// <summary>
-        /// Execute all backup tasks
+        /// Execute all the backup tasks and update the state of the tasks
         /// </summary>
+        /// <param name="stateTrackLogger"></param>
         public List<(BackupModel, long, long, long)> ExecuteAllTasks(StateTrackLogger stateTrackLogger)
         {
             List<(BackupModel, long, long, long)> results = new List<(BackupModel, long, long, long)>();
             foreach (var task in this.BackupTasks)
             {
-                results.Add(ExecuteTaskByKey(task.Key, stateTrackLogger));
+                results.Add(ExecuteTaskByKey(task.Key, stateTrackLogger)); // Execute the task and add the result to the list
             }
-            return results;
+            return results; // Return the task, the total size of the backup, the duration of the backup and the total time of encryption for each task executed for the DailyLogger
         }
 
         /// <summary>
@@ -174,14 +184,16 @@ namespace easysave.Model
             string destinationDirectory = task.DestinationDirectory;
             BackupType backupType = task.Type;
 
+            // Get information about the source and destination directories
             var sourceDir = new DirectoryInfo(sourceDirectory);
             var destDir = new DirectoryInfo(destinationDirectory);
-
+            
             if (task.Type == BackupType.Full || !destDir.Exists)
             {
                 Stack<DirectoryInfo> stack = new Stack<DirectoryInfo>();
-                stack.Push(sourceDir);
+                stack.Push(sourceDir); // Add the source directory to the stack
 
+                // Calculate the size of the files to transfer and the number of files to transfer
                 while (stack.Count > 0)
                 {
                     var currentDir = stack.Pop();
@@ -193,6 +205,7 @@ namespace easysave.Model
                     }
                     size += dirSize;
 
+                    // Add subdirectories to the stack for further processing
                     foreach (DirectoryInfo subDir in currentDir.GetDirectories())
                     {
                         stack.Push(subDir);
@@ -204,6 +217,7 @@ namespace easysave.Model
                 Stack<(DirectoryInfo, DirectoryInfo)> stack = new Stack<(DirectoryInfo, DirectoryInfo)>();
                 stack.Push((sourceDir, destDir));
 
+                // Calculate the size of the files to transfer and the number of files to transfer
                 while (stack.Count > 0)
                 {
                     var (currentSource, currentDestination) = stack.Pop();
@@ -220,6 +234,7 @@ namespace easysave.Model
                         string targetFilePath = Path.Combine(currentDestination.FullName, file.Name);
                         FileInfo destFile = new FileInfo(targetFilePath);
 
+                        // If the file doesn't exist in the destination directory or if it's newer in the source directory,
                         if (!destFile.Exists || file.LastWriteTime > destFile.LastWriteTime)
                         {
                             size += file.Length;
@@ -236,7 +251,7 @@ namespace easysave.Model
                 }
             }
 
-            return (size, fileCount);
+            return (size, fileCount); // Return the size of the files to transfer and the number of files to transfer
         }
 
         /// <summary>
@@ -248,20 +263,20 @@ namespace easysave.Model
         private long EncryptFile(string sourceFile, string destinationFile)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = $"\"{App.appConfigData.CryptosoftPath}\""; // Chemin de l'exécutable de chiffrement
-            startInfo.Arguments = $"\"{sourceFile}\" \"{destinationFile}.chiffre\""; // Fichier source et destination
-            startInfo.RedirectStandardOutput = true;
-            startInfo.UseShellExecute = false;
+            startInfo.FileName = $"\"{App.appConfigData.CryptosoftPath}\""; // Path to the cryptosoft executable
+            startInfo.Arguments = $"\"{sourceFile}\" \"{destinationFile}.chiffre\""; // Arguments for the cryptosoft executable
+            startInfo.RedirectStandardOutput = true; // Redirect the standard output
+            startInfo.UseShellExecute = false; // Don't use the shell execute to run the process (use the standard output)
 
             var stopWatch = new Stopwatch();
             stopWatch.Start();
             using (Process process = Process.Start(startInfo))
             {
-                // Attendre que le processus de chiffrement se termine
+                // Wait for the process to exit
                 process.WaitForExit();
                 stopWatch.Stop();
 
-                // Vérifier le code de retour du processus
+                // If the process exited with no errors, return the duration of the encryption
                 if (process.ExitCode > 0)
                 {
                     return stopWatch.ElapsedMilliseconds;
@@ -273,21 +288,62 @@ namespace easysave.Model
             }
         }
 
-        private void ReorderKeys()
+        /// <summary>
+        /// Reorder the keys of the backup tasks
+        /// </summary>
+        public void ReorderKeys()
         {
             int newKey = 1;
             Dictionary<int, BackupModel> reordenedBackupTasks = new Dictionary<int, BackupModel>();
 
+            // Create a new dictionary with the keys reordered
             foreach (var kvp in BackupTasks.OrderBy(kv => kv.Key))
             {
                 reordenedBackupTasks.Add(newKey++, kvp.Value);
             }
 
-            BackupTasks.Clear();
+            BackupTasks.Clear(); // Clear the backup tasks
 
+            // Add the backup tasks with the reordered keys
             foreach (var kvp in reordenedBackupTasks)
             {
                 BackupTasks.Add(kvp.Key, kvp.Value);
+            }
+            SaveBackupTasks(); // Save the backup tasks to the save file
+        }
+
+        /// <summary>
+        /// Load the backup tasks from the save file
+        /// </summary>
+        /// <returns>
+        /// A dictionary of backup tasks
+        /// </returns>
+        private Dictionary<int, BackupModel> LoadBackupTasks()
+        {
+            string savePath = App.appConfigData.SavesPath; // Path to the save file
+            if (File.Exists(savePath))
+            {
+                string backupTasksJSON = File.ReadAllText(savePath); // Read the save file
+                Dictionary<int, BackupModel> backupTasksFromJSON = JsonSerializer.Deserialize<Dictionary<int, BackupModel>>(backupTasksJSON); // Deserialize the JSON to a dictionary of backup tasks
+                return backupTasksFromJSON;
+            }
+            return new Dictionary<int, BackupModel>(); // Return an empty dictionary if the save file doesn't exist
+        }
+
+        /// <summary>
+        /// Save the backup tasks to the save file
+        /// </summary>
+        private void SaveBackupTasks()
+        {
+            string savePath = App.appConfigData.SavesPath; // Path to the save file
+            string backupTasksToJSON = JsonSerializer.Serialize(this.BackupTasks, new JsonSerializerOptions { WriteIndented = true }); // Serialize the dictionary of backup tasks to JSON
+            if (File.Exists(savePath))
+            {
+                File.WriteAllText(savePath, backupTasksToJSON); // Write the JSON to the save file
+            } else
+            {
+                File.Create(savePath).Close(); // Create the save file if it doesn't exist
+                File.WriteAllText(savePath, backupTasksToJSON); // Write the JSON to the save file
             }
         }
     }

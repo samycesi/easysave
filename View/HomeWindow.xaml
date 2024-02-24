@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="easysave.View.HomeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <!-- Title & Image -->
+        <StackPanel Orientation="Horizontal">
+            <TextBlock
+                   Text="{DynamicResource Welcome}"
+                   FontSize="50"
+                   Foreground="Black"
+                   FontWeight="Medium"
+                   Width="320" Height="134" TextWrapping="WrapWithOverflow" Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Button -->
+        <Button Content="{DynamicResource Start}"
+            x:Name="StartButton"
+            Foreground="AliceBlue"
+            FontSize="14"
+            FontWeight="Medium"
+            HorizontalAlignment="Center"
+            Margin="0 20 0 0"
+            Command="{Binding CreateTaskViewCommand}" VerticalAlignment="Center">
+
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="#FE6583"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#FF4C70"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border Width="125"
+                        Height="25"
+                        CornerRadius="10"
+                        Background="{TemplateBinding Background}">
+                        <ContentPresenter VerticalAlignment="Center"
+                                      HorizontalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </StackPanel>
+</UserControl>

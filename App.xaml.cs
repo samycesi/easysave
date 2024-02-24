@@ -12,7 +12,8 @@ namespace easysave
 
         public App()
         {
-            appConfigData = new AppConfigData();
+            Config config = new Config();
+            appConfigData = config.LoadFromFile();
         }
     }
 

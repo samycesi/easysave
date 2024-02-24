@@ -14,5 +14,11 @@ namespace easysave.Model
             this.DestinationDirectory = destinationDirectory;
             this.Type = type;
         }
+
+        override
+        public string ToString()
+        {
+            return "Name: " + this.Name + " Source: " + this.SourceDirectory + " Destination: " + this.DestinationDirectory + " Type: " + this.Type;
+        }
     }
 }
