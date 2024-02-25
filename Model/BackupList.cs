@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using easysave.Model.Logger;
 
 namespace easysave.Model
@@ -16,6 +17,8 @@ namespace easysave.Model
 
         public event EventHandler<BackupEvent> BackupTaskAdded;
         public event EventHandler<BackupEvent> BackupTaskRemoved;
+
+        private AutoResetEvent fileAccessEvent = new AutoResetEvent(true);
 
         public BackupList()
         {
@@ -51,7 +54,7 @@ namespace easysave.Model
         /// <param name="stateTrackLogger"></param>
         /// <returns></returns>
         /// <exception cref="DirectoryNotFoundException"></exception>
-        public (BackupModel, long, long, long) ExecuteTaskByKey(int key, StateTrackLogger stateTrackLogger)
+        public (BackupModel, long, long, long) ExecuteTaskByKey(int key)
         {
             BackupModel task = BackupTasks[key];
             string sourceDirectory = task.SourceDirectory;
@@ -94,8 +97,13 @@ namespace easysave.Model
             long filesLeftToDo = totalFileCount;
             long fileSizeLeftToDo = totalBackupSize;
 
+            // Init progress
+            int progress = 0;
+
             // Update the state of the task to active
-            stateTrackLogger.UpdateActive(totalFileCount, totalBackupSize, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory, task.Name);
+            fileAccessEvent.WaitOne();
+            task.State.Init("ACTIVE", totalFileCount, totalBackupSize, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory);
+            fileAccessEvent.Set();
 
             while (stack.Count > 0)
             {
@@ -140,7 +148,10 @@ namespace easysave.Model
                         totalEncryptionTime += encryptionDuration;
                         filesLeftToDo--;
                         fileSizeLeftToDo -= file.Length;
-                        stateTrackLogger.UpdateActive(totalFileCount, totalBackupSize, filesLeftToDo, fileSizeLeftToDo, Path.Combine(currentSource.FullName, file.Name), targetFilePath, task.Name);
+                        progress = (int)(((totalFileCount - filesLeftToDo) / (double)totalFileCount) * 100);
+                        fileAccessEvent.WaitOne();
+                        task.State.Update("ACTIVE", progress, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory);
+                        fileAccessEvent.Set();
                     }
                 }
 
@@ -151,6 +162,9 @@ namespace easysave.Model
                     stack.Push((subDir, new DirectoryInfo(newDestinationDir)));
                 }
             }
+            fileAccessEvent.WaitOne();
+            task.State.Update("INACTIVE", 100, 0, 0, sourceDirectory, destinationDirectory); // Update the state of the task to inactive
+            fileAccessEvent.Set();
             stopwatch.Stop();
             var duration = stopwatch.Elapsed;
             return (task, totalBackupSize, duration.Milliseconds, totalEncryptionTime); // Return the task, the total size of the backup, the duration of the backup and the total time of encryption for the DailyLogger
@@ -160,12 +174,12 @@ namespace easysave.Model
         /// Execute all the backup tasks and update the state of the tasks
         /// </summary>
         /// <param name="stateTrackLogger"></param>
-        public List<(BackupModel, long, long, long)> ExecuteAllTasks(StateTrackLogger stateTrackLogger)
+        public List<(BackupModel, long, long, long)> ExecuteAllTasks()
         {
             List<(BackupModel, long, long, long)> results = new List<(BackupModel, long, long, long)>();
             foreach (var task in this.BackupTasks)
             {
-                results.Add(ExecuteTaskByKey(task.Key, stateTrackLogger)); // Execute the task and add the result to the list
+                results.Add(ExecuteTaskByKey(task.Key)); // Execute the task and add the result to the list
             }
             return results; // Return the task, the total size of the backup, the duration of the backup and the total time of encryption for each task executed for the DailyLogger
         }

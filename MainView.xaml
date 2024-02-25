@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:easysave"
         xmlns:viewModel="clr-namespace:easysave.ViewModel"
         mc:Ignorable="d"
-        Title="MainView" Height="600" Width="970">
+        Title="MainView" Height="600" Width="1000">
 
     <Window.DataContext>
         <viewModel:MainViewModel/>

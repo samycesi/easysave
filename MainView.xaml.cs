@@ -1,6 +1,4 @@
-﻿using easysave.View;
-using easysave.ViewModel;
-using Easysave.Model;
+﻿using easysave.ViewModel;
 using System.Globalization;
 using System.Resources;
 using System.Windows;

@@ -1,3 +1,5 @@
+using easysave.Model.Logger;
+
 namespace easysave.Model
 {
     public class BackupModel
@@ -6,6 +8,7 @@ namespace easysave.Model
         public string SourceDirectory { get; set; }
         public string DestinationDirectory { get; set; }
         public BackupType Type { get; set; }
+        public StateTrackData State { get; set; }
 
         public BackupModel(string name, string sourceDirectory, string destinationDirectory, BackupType type)
         {
@@ -13,6 +16,7 @@ namespace easysave.Model
             this.SourceDirectory = sourceDirectory;
             this.DestinationDirectory = destinationDirectory;
             this.Type = type;
+            this.State = new StateTrackData(name);
         }
 
         override

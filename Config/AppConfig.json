@@ -1,10 +1,10 @@
 {
-  "stateTrackPath": "",
-  "dailyPath": "",
+  "stateTrackPath": "D:\\",
+  "dailyPath": "D:\\",
   "fileExtensionToEncrypt": "",
   "cryptosoftPath": "D:\\DEV\\easysave\\CRYPTOSOFT\\cryptosoft.exe",
   "language": "en",
-  "businessSoftwarePath": "",
+  "businessSoftwarePath": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsCalculator_11.2311.0.0_x64__8wekyb3d8bbwe\\CalculatorApp.exe",
   "logExtension": ".json",
   "savesPath": "D:\\DEV\\easysave\\Config\\TasksSave.json"
 }

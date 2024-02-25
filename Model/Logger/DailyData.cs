@@ -6,31 +6,31 @@ namespace easysave.Model.Logger
 {
     public class DailyData
     {
-        [JsonProperty("Name")]
+        [JsonProperty(nameof(Name))]
         [XmlElement("Name")]
         public string Name { get; set; }
 
-        [JsonProperty("SourceDirectory")]
+        [JsonProperty(nameof(SourceDirectory))]
         [XmlElement("SourceDirectory")]
         public string SourceDirectory { get; set; }
 
-        [JsonProperty("DestinationDirectory")]
+        [JsonProperty(nameof(DestinationDirectory))]
         [XmlElement("DestinationDirectory")]
         public string DestinationDirectory { get; set; }
 
-        [JsonProperty("FileSize")]
+        [JsonProperty(nameof(FileSize))]
         [XmlElement("FileSize")]
         public long FileSize { get; set; }
 
-        [JsonProperty("FileTransferTime")]
+        [JsonProperty(nameof(FileTransferTime))]
         [XmlElement("FileTransferTime")]
         public long FileTransferTime { get; set; }
 
-        [JsonProperty("Time")]
+        [JsonProperty(nameof(Time))]
         [XmlElement("Time")]
         public DateTime Time { get; set; }
 
-        [JsonProperty("TotalEncryptionTime")]
+        [JsonProperty(nameof(TotalEncryptionTime))]
         [XmlElement("TotalEncryptionTime")]
         public long TotalEncryptionTime { get; set; }
 

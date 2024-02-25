@@ -4,11 +4,12 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows.Input;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Diagnostics;
 using System.IO;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace easysave.ViewModel
 {
@@ -25,7 +26,8 @@ namespace easysave.ViewModel
         public RelayCommand RefreshCommand { get; }
 
         public DailyLogger DailyLogger { get; set; }
-        public StateTrackLogger StateTrackLogger { get; set; }
+
+        private AutoResetEvent fileAccessEvent = new AutoResetEvent(true);
 
         private string _consoleOutput;
 
@@ -48,7 +50,6 @@ namespace easysave.ViewModel
             RefreshCommand = new RelayCommand(RefreshBackupTasks);
 
             this.DailyLogger = MainViewModel.DailyLogger;
-            this.StateTrackLogger = MainViewModel.StateTrackLogger;
         }
 
         /// <summary>
@@ -58,40 +59,52 @@ namespace easysave.ViewModel
         private void ExecuteBackup(object parameter)
         {
             var selectedBackups = BackupTasks.Where(task => task.IsSelected).ToList(); // Get the selected backups
+
+            List<Task> backupTasks = new List<Task>();
+
             foreach (var backup in selectedBackups)
-            {
-                // Check if the calculator process is running
-                while (IsBusinessSoftwareRunning())
+            { 
+                Task task = Task.Run(() =>
                 {
-                    // Log a message indicating that the backup execution is paused
-                    string pauseMessage = "Backup execution paused because the business software is running";
-                    AppendToConsole(pauseMessage);
+                    // Check if the business software process is running
+                    while (IsBusinessSoftwareRunning())
+                    {
+                        // Log a message indicating that the backup execution is paused
+                        string pauseMessage = "Backup execution paused because the business software is running";
+                        AppendToConsole(pauseMessage);
 
-                    // Sleep for a short duration before checking again
-                    Thread.Sleep(1000); // Sleep for 1 second (adjust as needed)
-                }
+                        // Sleep for a short duration before checking again
+                        Thread.Sleep(1000); // Sleep for 1 second (adjust as needed)
+                    }
 
-                // Log the backup execution in the console
-                string logMessage = $"Task {backup.Backup.Name} launched";
-                AppendToConsole(logMessage);
+                    // Log the backup execution in the console
+                    string logMessage = $"Task {backup.Backup.Name} launched";
+                    AppendToConsole(logMessage);
 
-                // Execute the backup
-                (BackupModel task, long fileSize, long fileTransferTime, long totalEncryptionTime) = backupList.ExecuteTaskByKey(backup.Key, StateTrackLogger);
+                    // Execute the backup
+                    (BackupModel task, long fileSize, long fileTransferTime, long totalEncryptionTime) = backupList.ExecuteTaskByKey(backup.Key);
 
-                // Log the backup execution in the daily log
-                switch (App.appConfigData.LogExtension)
-                {
-                    case ".json":
-                        DailyLogger.WriteDailyLogJSON(task, fileSize, fileTransferTime, totalEncryptionTime);
-                        break;
-                    case ".xml":
-                        DailyLogger.WriteDailyLogXML(task, fileSize, fileTransferTime, totalEncryptionTime);
-                        break;
-                }
+                    // Log the backup execution in the daily log
+                    switch (App.appConfigData.LogExtension)
+                    {
+                        case ".json":
+                            fileAccessEvent.WaitOne();
+                            DailyLogger.WriteDailyLogJSON(task, fileSize, fileTransferTime, totalEncryptionTime);
+                            fileAccessEvent.Set();
+                            break;
+                        case ".xml":
+                            fileAccessEvent.WaitOne();
+                            DailyLogger.WriteDailyLogXML(task, fileSize, fileTransferTime, totalEncryptionTime);
+                            fileAccessEvent.Set();
+                            break;
+                    }
 
-                // Log the backup execution in the console
-                logMessage = $"Task {task.Name} finished successfully in {fileTransferTime}ms";
-                AppendToConsole(logMessage);
+                    // Log the backup execution in the console
+                    logMessage = $"Task {task.Name} finished successfully in {fileTransferTime}ms";
+                    AppendToConsole(logMessage);
+                });
+
+                backupTasks.Add(task);
             }
         }
 
@@ -149,7 +162,9 @@ namespace easysave.ViewModel
         /// <param name="message"></param>
         private void AppendToConsole(string message)
         {
+            
             ConsoleOutput += "> " + message + "\n";
+            Console.WriteLine(message);
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
