@@ -1,6 +1,8 @@
 ﻿using easysave.ViewModel;
+using System;
 using System.Globalization;
 using System.Resources;
+using System.Threading;
 using System.Windows;
 
 namespace easysave
@@ -14,14 +16,34 @@ namespace easysave
 
         CultureInfo cultureInfo;
 
+        private static readonly string MutexId = "1";
+
+        private Mutex singleInstanceMutex;
+
         public MainView()
         {
+            // Tentative de créer un mutex
+            singleInstanceMutex = new Mutex(true, MutexId, out bool createdNew);
+
+            if (!createdNew)
+            {
+                // Une autre instance est déjà en cours d'exécution
+                // Fermez cette instance
+                MessageBox.Show("L'application est déjà en cours d'exécution.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                Application.Current.Shutdown();
+            }
             InitializeComponent();
             ressourceManager = new ResourceManager("easysave.Properties.Resources", typeof(MainView).Assembly);
             cultureInfo = CultureInfo.CreateSpecificCulture(App.appConfigData.Language);
             SetLanguage(App.appConfigData.Language);
             viewModel = new MainViewModel();
             DataContext = viewModel;
+        }
+    
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            // Libération du mutex lors de la fermeture de la fenêtre
+            singleInstanceMutex.ReleaseMutex();
         }
 
         /// <summary>
