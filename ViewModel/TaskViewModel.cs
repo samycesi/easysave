@@ -15,6 +15,10 @@ namespace easysave.ViewModel
 {
     public class TaskViewModel : INotifyPropertyChanged
     {
+        public static Barrier barrierPrio = new Barrier(0);
+        public static Mutex mutex = new Mutex();
+
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private BackupList backupList;
@@ -61,6 +65,9 @@ namespace easysave.ViewModel
             var selectedBackups = BackupTasks.Where(task => task.IsSelected).ToList(); // Get the selected backups
 
             List<Task> backupTasks = new List<Task>();
+
+            // Add the participants to the barrier (= the amount of selected backups)
+            barrierPrio.AddParticipants(selectedBackups.Count);
 
             foreach (var backup in selectedBackups)
             { 

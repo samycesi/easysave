@@ -5,14 +5,15 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 using easysave.Model.Logger;
+using easysave.ViewModel;
 
 namespace easysave.Model
 {
 
     public class BackupList
     {
-
         public Dictionary<int, BackupModel> BackupTasks { get; set; }
 
         public event EventHandler<BackupEvent> BackupTaskAdded;
@@ -62,6 +63,8 @@ namespace easysave.Model
             BackupType backupType = task.Type;
 
             string extension = App.appConfigData.FileExtensionToEncrypt;
+            string[] priorityExtensions = App.appConfigData.PriorityExtensions;
+            long thresholdFileSize = App.appConfigData.ThresholdFileSize;
 
             var sourceDir = new DirectoryInfo(sourceDirectory);
             var destDir = new DirectoryInfo(destinationDirectory);
@@ -89,10 +92,6 @@ namespace easysave.Model
             // Total time of encryption for the backup
             long totalEncryptionTime = 0;
 
-            // Perform backup (full or differential)
-            Stack<(DirectoryInfo, DirectoryInfo)> stack = new Stack<(DirectoryInfo, DirectoryInfo)>();
-            stack.Push((sourceDir, destDir));
-
             // Remaining files and size to backup
             long filesLeftToDo = totalFileCount;
             long fileSizeLeftToDo = totalBackupSize;
@@ -105,61 +104,71 @@ namespace easysave.Model
             task.State.Init("ACTIVE", totalFileCount, totalBackupSize, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory);
             fileAccessEvent.Set();
 
-            while (stack.Count > 0)
+            // List of files in source Directory
+            string[] files = Directory.GetFiles(sourceDir.FullName, "*.*", SearchOption.AllDirectories);
+
+            // Create two lists : one for priority files, and the other for the remaining files
+            var files_prio = files.Where(f => priorityExtensions.Contains(Path.GetExtension(f))).ToArray();
+            var other_files = files.Except(files_prio).ToArray();
+
+            // Sort priority files
+            var fichiersTries = files_prio
+                .OrderBy(f => Array.IndexOf(priorityExtensions, Path.GetExtension(f)))
+                .ThenBy(f => f)
+                .ToArray();
+
+            foreach (var fichier in fichiersTries)
             {
-                var (currentSource, currentDestination) = stack.Pop();
-
-                // Get information about the current directory
-                var dir = currentSource;
-
-                // Check if the directory exists
-                if (!dir.Exists)
-                    throw new DirectoryNotFoundException($"Source directory not found: {dir.FullName}");
-
-                // Get subdirectories of the current directory
-                DirectoryInfo[] dirs = dir.GetDirectories();
-
-                // Create the destination directory if it doesn't exist (for differential backup)
-                if (!currentDestination.Exists)
-                    Directory.CreateDirectory(currentDestination.FullName);
-
-                // Copy files from the current directory to the destination directory
-                foreach (FileInfo file in dir.GetFiles())
+                FileInfo file = new FileInfo(fichier);
+                if (file.Length > thresholdFileSize)
                 {
-                    string targetFilePath = Path.Combine(currentDestination.FullName, file.Name);
-                    FileInfo destFile = new FileInfo(targetFilePath);
-
-                    // For full backup or if the file doesn't exist in the destination directory or if it's newer in the source directory,
-                    // perform a differential backup by copying the file from source to destination
-                    if (backupType == BackupType.Full || !destFile.Exists || file.LastWriteTime > destFile.LastWriteTime)
+                    try
                     {
-                        long encryptionDuration;
-                        if (Path.GetExtension(file.Name) == extension)
-                        {
-                            // Encrypt the file
-                            encryptionDuration = EncryptFile(file.FullName, targetFilePath);
-                        }
-                        else
-                        {
-                            // Copy the file
-                            file.CopyTo(targetFilePath, true);
-                            encryptionDuration = 0;
-                        }
-                        totalEncryptionTime += encryptionDuration;
-                        filesLeftToDo--;
-                        fileSizeLeftToDo -= file.Length;
-                        progress = (int)(((totalFileCount - filesLeftToDo) / (double)totalFileCount) * 100);
-                        fileAccessEvent.WaitOne();
-                        task.State.Update("ACTIVE", progress, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory);
-                        fileAccessEvent.Set();
+                        TaskViewModel.mutex.WaitOne();
+
+                        (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                                                                                   backupType, totalEncryptionTime, filesLeftToDo,
+                                                                                   fileSizeLeftToDo, progress, totalFileCount, task);
+                    }
+                    finally
+                    {
+                        TaskViewModel.mutex.ReleaseMutex(); 
                     }
                 }
-
-                // Add subdirectories to the stack for further processing
-                foreach (DirectoryInfo subDir in dirs)
+                else
                 {
-                    string newDestinationDir = Path.Combine(currentDestination.FullName, subDir.Name);
-                    stack.Push((subDir, new DirectoryInfo(newDestinationDir)));
+                    (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                                                                                   backupType, totalEncryptionTime, filesLeftToDo,
+                                                                                   fileSizeLeftToDo, progress, totalFileCount, task);
+                }
+            }
+
+            TaskViewModel.barrierPrio.SignalAndWait();
+            TaskViewModel.barrierPrio.RemoveParticipants(1);
+
+            foreach (var fichier in other_files)
+            {
+                FileInfo file = new FileInfo(fichier);
+                if (file.Length > thresholdFileSize)
+                {
+                    try
+                    {
+                        TaskViewModel.mutex.WaitOne();
+
+                        (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                                                                                   backupType, totalEncryptionTime, filesLeftToDo,
+                                                                                   fileSizeLeftToDo, progress, totalFileCount, task);
+                    }
+                    finally
+                    {
+                        TaskViewModel.mutex.ReleaseMutex(); 
+                    }
+                }
+                else
+                {
+                    (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                                                                                   backupType, totalEncryptionTime, filesLeftToDo,
+                                                                                   fileSizeLeftToDo, progress, totalFileCount, task);
                 }
             }
             fileAccessEvent.WaitOne();
@@ -167,7 +176,69 @@ namespace easysave.Model
             fileAccessEvent.Set();
             stopwatch.Stop();
             var duration = stopwatch.Elapsed;
-            return (task, totalBackupSize, duration.Milliseconds, totalEncryptionTime); // Return the task, the total size of the backup, the duration of the backup and the total time of encryption for the DailyLogger
+            return (task, totalBackupSize, duration.Milliseconds, totalEncryptionTime); // Return the task, the total size of the backup, the duration of the backup and the total time of encryption for the DailyLogger*/
+        }
+
+
+        /// <summary>
+        /// The mechanism to copy file
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="sourceDirectory"></param>
+        /// <param name="destinationDirectory"></param>
+        /// <param name="extension"></param>
+        /// <param name="backupType"></param>
+        /// <param name="totalEncryptionTime"></param>
+        /// <param name="filesLeftToDo"></param>
+        /// <param name="fileSizeLeftToDo"></param>
+        /// <param name="progress"></param>
+        /// <param name="totalFileCount"></param>
+        /// <param name="task"></param>
+        /// <returns></returns>
+        private (long, long, long) CopyFile(FileInfo file, string sourceDirectory, string destinationDirectory, string extension, BackupType backupType,
+                              long totalEncryptionTime, long filesLeftToDo, long fileSizeLeftToDo, int progress, int totalFileCount, BackupModel task)
+        {
+            // Check if the directory exists
+            /*                if (!file.Directory.Exists)
+                                throw new DirectoryNotFoundException($"Source directory not found: {file.Directory.FullName}");
+            */
+
+            // Construct the target file path in the destination directory
+            string relativePath = Path.GetRelativePath(sourceDirectory, file.FullName);
+            string targetFilePath = Path.Combine(destinationDirectory, relativePath);
+
+            DirectoryInfo currentDestination = new DirectoryInfo(Path.GetDirectoryName(targetFilePath));
+            // Create the destination directory if it doesn't exist
+            if (!currentDestination.Exists)
+                Directory.CreateDirectory(currentDestination.FullName);
+
+            // FOR EACH FILE DU DIRECTORY
+            FileInfo destFile = new FileInfo(targetFilePath);
+
+            // For full backup or if the file doesn't exist in the destination directory or if it's newer in the source directory,
+            // perform a differential backup by copying the file from source to destination
+            if (backupType == BackupType.Full || !destFile.Exists || file.LastWriteTime > destFile.LastWriteTime)
+            {
+                long encryptionDuration;
+                if (Path.GetExtension(file.Name) == extension)
+                {
+                    // Encrypt the file
+                    encryptionDuration = EncryptFile(file.FullName, targetFilePath);
+                }
+                else
+                {
+                    // Copy the file
+                    file.CopyTo(targetFilePath, true);
+                    encryptionDuration = 0;
+                }
+                totalEncryptionTime += encryptionDuration;
+                filesLeftToDo--;
+                fileSizeLeftToDo -= file.Length;
+                fileAccessEvent.WaitOne();
+                task.State.Update("ACTIVE", progress, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory);
+                fileAccessEvent.Set();
+            }
+            return (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo);
         }
 
         /// <summary>
@@ -179,7 +250,7 @@ namespace easysave.Model
             List<(BackupModel, long, long, long)> results = new List<(BackupModel, long, long, long)>();
             foreach (var task in this.BackupTasks)
             {
-                results.Add(ExecuteTaskByKey(task.Key)); // Execute the task and add the result to the list
+                //results.Add(ExecuteTaskByKey(task.Key)); // Execute the task and add the result to the list
             }
             return results; // Return the task, the total size of the backup, the duration of the backup and the total time of encryption for each task executed for the DailyLogger
         }
