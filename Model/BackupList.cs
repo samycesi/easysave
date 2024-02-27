@@ -126,20 +126,22 @@ namespace easysave.Model
                     {
                         TaskViewModel.mutex.WaitOne();
 
-                        (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                        (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
                                                                                    backupType, totalEncryptionTime, filesLeftToDo,
                                                                                    fileSizeLeftToDo, progress, totalFileCount, task);
+                        Thread.Sleep(1000);
                     }
                     finally
                     {
-                        TaskViewModel.mutex.ReleaseMutex(); 
+                        TaskViewModel.mutex.ReleaseMutex();
                     }
                 }
                 else
                 {
-                    (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                    (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
                                                                                    backupType, totalEncryptionTime, filesLeftToDo,
                                                                                    fileSizeLeftToDo, progress, totalFileCount, task);
+                    Thread.Sleep(1000);
                 }
             }
 
@@ -155,20 +157,22 @@ namespace easysave.Model
                     {
                         TaskViewModel.mutex.WaitOne();
 
-                        (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                        (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
                                                                                    backupType, totalEncryptionTime, filesLeftToDo,
                                                                                    fileSizeLeftToDo, progress, totalFileCount, task);
+                        Thread.Sleep(1000);
                     }
                     finally
                     {
-                        TaskViewModel.mutex.ReleaseMutex(); 
+                        TaskViewModel.mutex.ReleaseMutex();
                     }
                 }
                 else
                 {
-                    (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                    (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
                                                                                    backupType, totalEncryptionTime, filesLeftToDo,
                                                                                    fileSizeLeftToDo, progress, totalFileCount, task);
+                    Thread.Sleep(1000);
                 }
             }
             fileAccessEvent.WaitOne();
@@ -195,7 +199,7 @@ namespace easysave.Model
         /// <param name="totalFileCount"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        private (long, long, long) CopyFile(FileInfo file, string sourceDirectory, string destinationDirectory, string extension, BackupType backupType,
+        private (long, long, long, int) CopyFile(FileInfo file, string sourceDirectory, string destinationDirectory, string extension, BackupType backupType,
                               long totalEncryptionTime, long filesLeftToDo, long fileSizeLeftToDo, int progress, int totalFileCount, BackupModel task)
         {
             // Check if the directory exists
@@ -234,11 +238,12 @@ namespace easysave.Model
                 totalEncryptionTime += encryptionDuration;
                 filesLeftToDo--;
                 fileSizeLeftToDo -= file.Length;
+                progress = (int)(((totalFileCount - filesLeftToDo) / (double)totalFileCount) * 100);
                 fileAccessEvent.WaitOne();
                 task.State.Update("ACTIVE", progress, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory);
                 fileAccessEvent.Set();
             }
-            return (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo);
+            return (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress);
         }
 
         /// <summary>
@@ -272,7 +277,7 @@ namespace easysave.Model
             // Get information about the source and destination directories
             var sourceDir = new DirectoryInfo(sourceDirectory);
             var destDir = new DirectoryInfo(destinationDirectory);
-            
+
             if (task.Type == BackupType.Full || !destDir.Exists)
             {
                 Stack<DirectoryInfo> stack = new Stack<DirectoryInfo>();
@@ -425,7 +430,8 @@ namespace easysave.Model
             if (File.Exists(savePath))
             {
                 File.WriteAllText(savePath, backupTasksToJSON); // Write the JSON to the save file
-            } else
+            }
+            else
             {
                 File.Create(savePath).Close(); // Create the save file if it doesn't exist
                 File.WriteAllText(savePath, backupTasksToJSON); // Write the JSON to the save file
