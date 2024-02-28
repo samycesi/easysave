@@ -108,28 +108,27 @@ namespace easysave.Model
             string[] files = Directory.GetFiles(sourceDir.FullName, "*.*", SearchOption.AllDirectories);
 
             // Create two lists : one for priority files, and the other for the remaining files
-            var files_prio = files.Where(f => priorityExtensions.Contains(Path.GetExtension(f))).ToArray();
-            var other_files = files.Except(files_prio).ToArray();
+            var prio_files = files.Where(f => priorityExtensions.Contains(Path.GetExtension(f))).ToArray();
+            var other_files = files.Except(prio_files).ToArray();
 
             // Sort priority files
-            var fichiersTries = files_prio
+            var sorted_prio_files = prio_files
                 .OrderBy(f => Array.IndexOf(priorityExtensions, Path.GetExtension(f)))
                 .ThenBy(f => f)
                 .ToArray();
 
-            foreach (var fichier in fichiersTries)
+            foreach (var file in sorted_prio_files)
             {
-                FileInfo file = new FileInfo(fichier);
-                if (file.Length > thresholdFileSize)
+                FileInfo file_info = new FileInfo(file);
+                if (file_info.Length > thresholdFileSize)
                 {
                     try
                     {
                         TaskViewModel.mutex.WaitOne();
 
-                        (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                        (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file_info, sourceDirectory, destinationDirectory, extension,
                                                                                    backupType, totalEncryptionTime, filesLeftToDo,
                                                                                    fileSizeLeftToDo, progress, totalFileCount, task);
-                        Thread.Sleep(1000);
                     }
                     finally
                     {
@@ -138,29 +137,31 @@ namespace easysave.Model
                 }
                 else
                 {
-                    (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                    (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file_info, sourceDirectory, destinationDirectory, extension,
                                                                                    backupType, totalEncryptionTime, filesLeftToDo,
                                                                                    fileSizeLeftToDo, progress, totalFileCount, task);
-                    Thread.Sleep(1000);
                 }
             }
 
+            
             TaskViewModel.barrierPrio.SignalAndWait();
             TaskViewModel.barrierPrio.RemoveParticipants(1);
+            TaskViewModel.countdownEvent.Signal();
 
-            foreach (var fichier in other_files)
+
+            foreach (var file in other_files)
             {
-                FileInfo file = new FileInfo(fichier);
-                if (file.Length > thresholdFileSize)
+                TaskViewModel.countdownEvent.Wait();
+                FileInfo file_info = new FileInfo(file);
+                if (file_info.Length > thresholdFileSize)
                 {
                     try
                     {
                         TaskViewModel.mutex.WaitOne();
 
-                        (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                        (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file_info, sourceDirectory, destinationDirectory, extension,
                                                                                    backupType, totalEncryptionTime, filesLeftToDo,
                                                                                    fileSizeLeftToDo, progress, totalFileCount, task);
-                        Thread.Sleep(1000);
                     }
                     finally
                     {
@@ -169,10 +170,9 @@ namespace easysave.Model
                 }
                 else
                 {
-                    (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file, sourceDirectory, destinationDirectory, extension,
+                    (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file_info, sourceDirectory, destinationDirectory, extension,
                                                                                    backupType, totalEncryptionTime, filesLeftToDo,
                                                                                    fileSizeLeftToDo, progress, totalFileCount, task);
-                    Thread.Sleep(1000);
                 }
             }
             fileAccessEvent.WaitOne();

@@ -17,7 +17,7 @@ namespace easysave.ViewModel
     {
         public static Barrier barrierPrio = new Barrier(0);
         public static Mutex mutex = new Mutex();
-
+        public static CountdownEvent countdownEvent = new CountdownEvent(0);
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -68,6 +68,16 @@ namespace easysave.ViewModel
 
             // Add the participants to the barrier (= the amount of selected backups)
             barrierPrio.AddParticipants(selectedBackups.Count);
+
+            // Initialize or increment CountDownEvent to make sure backups are waiting for the priority files to be copied after the barrier
+            if (countdownEvent == null || countdownEvent.IsSet)
+            {
+                countdownEvent = new CountdownEvent(selectedBackups.Count);
+            }
+            else
+            {
+                countdownEvent.AddCount(selectedBackups.Count);
+            }
 
             foreach (var backup in selectedBackups)
             { 
