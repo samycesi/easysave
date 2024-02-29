@@ -135,7 +135,7 @@ namespace easysave.ViewModel
         private Socket Connect()
         {
             string ipAddress = "127.0.0.1";
-            int port = 8081;
+            int port = 8080;
 
             Socket listenerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -156,14 +156,7 @@ namespace easysave.ViewModel
 
         private Socket AcceptConnection(Socket listener)
         {
-            try
-            {
-                return listener.Accept();
-            }
-            catch (SocketException e)
-            {
-                return null;
-            }
+            return listener.Accept();
         }
 
         private void SendData(Socket client)

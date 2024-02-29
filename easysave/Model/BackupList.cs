@@ -230,9 +230,16 @@ namespace easysave.Model
             if (task.HasPrioFilesRemaining)
             {
                 TaskViewModel.barrierPrio.AddParticipants(1);
-                TaskViewModel.countdownEvent.AddCount(1);
+                if (TaskViewModel.countdownEvent == null || TaskViewModel.countdownEvent.IsSet)
+                {
+                    TaskViewModel.countdownEvent = new CountdownEvent(1);
+                }
+                else
+                {
+                    TaskViewModel.countdownEvent.AddCount(1);
+                }
             }
-            
+
         }
 
         private void Stop(BackupModel task)

@@ -66,7 +66,6 @@ namespace easysave.ViewModel
         /// <param name="parameter"></param>
         private void Execute(List<BackupTaskViewModel> taskToExecute)
         {
-
             List<Task> backupTasks = new List<Task>();
 
             // Add the participants to the barrier (= the amount of selected backups)
@@ -86,7 +85,6 @@ namespace easysave.ViewModel
             {
                 Task task = Task.Run(() =>
                 {
-
                     // Log the backup execution in the console
                     string logMessage = $"Task {backup.Backup.Name} launched";
                     AppendToConsole(logMessage);
@@ -113,7 +111,6 @@ namespace easysave.ViewModel
                     logMessage = $"Task {task.Name} finished successfully in {fileTransferTime}ms";
                     AppendToConsole(logMessage);
                 });
-
                 backupTasks.Add(task);
             }
         }
@@ -131,9 +128,10 @@ namespace easysave.ViewModel
                 else if (backup.Backup.State.State == "INACTIVE" || backup.Backup.State.State == "STOPPED")
                 {
                     taskToExecute.Add(backup);
+                    backup.IsSelected = false;
                 }
             }
-            if (taskToExecute.Count()>0)
+            if (taskToExecute.Count() > 0)
             {
                 Execute(taskToExecute);
             }
@@ -159,7 +157,6 @@ namespace easysave.ViewModel
                 backup.Backup.State.State = "STOPPED";
             }
         }
-
 
         /// <summary>
         /// Deletes the selected backups
