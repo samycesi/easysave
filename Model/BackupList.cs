@@ -111,6 +111,11 @@ namespace easysave.Model
             var prio_files = files.Where(f => priorityExtensions.Contains(Path.GetExtension(f))).ToArray();
             var other_files = files.Except(prio_files).ToArray();
 
+            if (prio_files.Length > 0)
+            {
+                task.HasPrioFilesRemaining = true;
+            }
+
             // Sort priority files
             var sorted_prio_files = prio_files
                 .OrderBy(f => Array.IndexOf(priorityExtensions, Path.GetExtension(f)))
@@ -120,6 +125,20 @@ namespace easysave.Model
             foreach (var file in sorted_prio_files)
             {
                 FileInfo file_info = new FileInfo(file);
+                if (task.State.State == "PAUSED")
+                {
+                    Pause(task);
+                }
+                if (task.State.State == "STOPPED")
+                {
+                    Stop(task);
+                    stopwatch.Stop();
+                    return (task, totalBackupSize, stopwatch.Elapsed.Milliseconds, totalEncryptionTime);
+                }
+                if (IsBusinessSoftwareRunning())
+                {
+                    BusinessRunningPause(task);
+                }
                 if (file_info.Length > thresholdFileSize)
                 {
                     try
@@ -143,22 +162,36 @@ namespace easysave.Model
                 }
             }
 
-            
+
             TaskViewModel.barrierPrio.SignalAndWait();
             TaskViewModel.barrierPrio.RemoveParticipants(1);
             TaskViewModel.countdownEvent.Signal();
 
+            task.HasPrioFilesRemaining = false;
 
             foreach (var file in other_files)
             {
                 TaskViewModel.countdownEvent.Wait();
                 FileInfo file_info = new FileInfo(file);
+                if (task.State.State == "PAUSED")
+                {
+                    Pause(task);
+                }
+                if (task.State.State == "STOPPED")
+                {
+                    Stop(task);
+                    stopwatch.Stop();
+                    return (task, totalBackupSize, stopwatch.Elapsed.Milliseconds, totalEncryptionTime);
+                }
+                if (IsBusinessSoftwareRunning())
+                {
+                    BusinessRunningPause(task);
+                }
                 if (file_info.Length > thresholdFileSize)
                 {
                     try
                     {
                         TaskViewModel.mutex.WaitOne();
-
                         (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress) = CopyFile(file_info, sourceDirectory, destinationDirectory, extension,
                                                                                    backupType, totalEncryptionTime, filesLeftToDo,
                                                                                    fileSizeLeftToDo, progress, totalFileCount, task);
@@ -183,6 +216,69 @@ namespace easysave.Model
             return (task, totalBackupSize, duration.Milliseconds, totalEncryptionTime); // Return the task, the total size of the backup, the duration of the backup and the total time of encryption for the DailyLogger*/
         }
 
+        private void Pause(BackupModel task)
+        {
+            if (task.HasPrioFilesRemaining)
+            {
+                TaskViewModel.barrierPrio.RemoveParticipants(1);
+                TaskViewModel.countdownEvent.Signal();
+            }
+            while (task.State.State == "PAUSED")
+            {
+            }
+
+            if (task.HasPrioFilesRemaining)
+            {
+                TaskViewModel.barrierPrio.AddParticipants(1);
+                TaskViewModel.countdownEvent.AddCount(1);
+            }
+            
+        }
+
+        private void Stop(BackupModel task)
+        {
+            if (task.HasPrioFilesRemaining)
+            {
+                TaskViewModel.barrierPrio.RemoveParticipants(1);
+                TaskViewModel.countdownEvent.Signal();
+            }
+            fileAccessEvent.WaitOne();
+            task.State.Update("INACTIVE", 0, 0, 0, task.SourceDirectory, task.DestinationDirectory); // Update the state of the task to inactive
+            fileAccessEvent.Set();
+        }
+
+        private bool IsBusinessSoftwareRunning()
+        {
+            if (App.appConfigData.BusinessSoftwarePath == null || App.appConfigData.BusinessSoftwarePath == "")
+            {
+                return false;
+            }
+            string softwarePath = App.appConfigData.BusinessSoftwarePath;
+            // Check if the business software process is running
+            string processName = Path.GetFileNameWithoutExtension(softwarePath);
+            Process[] processes = Process.GetProcessesByName(processName);
+            foreach (var process in processes)
+            {
+                if (process.MainModule.FileName.Equals(softwarePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void BusinessRunningPause(BackupModel task)
+        {
+            while (IsBusinessSoftwareRunning())
+            {
+                if (task.State.State == "STOPPED")
+                {
+                    Stop(task);
+                    return;
+                }
+                Thread.Sleep(1000);
+            }
+        }
 
         /// <summary>
         /// The mechanism to copy file
@@ -240,7 +336,7 @@ namespace easysave.Model
                 fileSizeLeftToDo -= file.Length;
                 progress = (int)(((totalFileCount - filesLeftToDo) / (double)totalFileCount) * 100);
                 fileAccessEvent.WaitOne();
-                task.State.Update("ACTIVE", progress, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory);
+                task.State.Update(task.State.State, progress, filesLeftToDo, fileSizeLeftToDo, sourceDirectory, destinationDirectory);
                 fileAccessEvent.Set();
             }
             return (totalEncryptionTime, filesLeftToDo, fileSizeLeftToDo, progress);

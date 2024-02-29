@@ -9,6 +9,7 @@ namespace easysave.Model
         public string DestinationDirectory { get; set; }
         public BackupType Type { get; set; }
         public StateTrackData State { get; set; }
+        public bool HasPrioFilesRemaining { get; set; }
 
         public BackupModel(string name, string sourceDirectory, string destinationDirectory, BackupType type)
         {
@@ -17,6 +18,7 @@ namespace easysave.Model
             this.DestinationDirectory = destinationDirectory;
             this.Type = type;
             this.State = new StateTrackData(name);
+            this.HasPrioFilesRemaining = false;
         }
 
         override

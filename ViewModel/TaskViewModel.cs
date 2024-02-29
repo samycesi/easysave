@@ -28,6 +28,8 @@ namespace easysave.ViewModel
         public RelayCommand ExecuteBackupCommand { get; }
         public RelayCommand DeleteBackupCommand { get; }
         public RelayCommand RefreshCommand { get; }
+        public RelayCommand PauseBackupCommand { get; }
+        public RelayCommand StopBackupCommand { get; }
 
         public DailyLogger DailyLogger { get; set; }
 
@@ -52,6 +54,8 @@ namespace easysave.ViewModel
             ExecuteBackupCommand = new RelayCommand(ExecuteBackup);
             DeleteBackupCommand = new RelayCommand(DeleteBackup);
             RefreshCommand = new RelayCommand(RefreshBackupTasks);
+            PauseBackupCommand = new RelayCommand(PauseBackup);
+            StopBackupCommand = new RelayCommand(StopBackup);
 
             this.DailyLogger = MainViewModel.DailyLogger;
         }
@@ -60,39 +64,28 @@ namespace easysave.ViewModel
         /// Executes the selected backups
         /// </summary>
         /// <param name="parameter"></param>
-        private void ExecuteBackup(object parameter)
+        private void Execute(List<BackupTaskViewModel> taskToExecute)
         {
-            var selectedBackups = BackupTasks.Where(task => task.IsSelected).ToList(); // Get the selected backups
 
             List<Task> backupTasks = new List<Task>();
 
             // Add the participants to the barrier (= the amount of selected backups)
-            barrierPrio.AddParticipants(selectedBackups.Count);
+            barrierPrio.AddParticipants(taskToExecute.Count);
 
             // Initialize or increment CountDownEvent to make sure backups are waiting for the priority files to be copied after the barrier
             if (countdownEvent == null || countdownEvent.IsSet)
             {
-                countdownEvent = new CountdownEvent(selectedBackups.Count);
+                countdownEvent = new CountdownEvent(taskToExecute.Count);
             }
             else
             {
-                countdownEvent.AddCount(selectedBackups.Count);
+                countdownEvent.AddCount(taskToExecute.Count);
             }
 
-            foreach (var backup in selectedBackups)
-            { 
+            foreach (var backup in taskToExecute)
+            {
                 Task task = Task.Run(() =>
                 {
-                    // Check if the business software process is running
-                    while (IsBusinessSoftwareRunning())
-                    {
-                        // Log a message indicating that the backup execution is paused
-                        string pauseMessage = "Backup execution paused because the business software is running";
-                        AppendToConsole(pauseMessage);
-
-                        // Sleep for a short duration before checking again
-                        Thread.Sleep(1000); // Sleep for 1 second (adjust as needed)
-                    }
 
                     // Log the backup execution in the console
                     string logMessage = $"Task {backup.Backup.Name} launched";
@@ -125,20 +118,46 @@ namespace easysave.ViewModel
             }
         }
 
-        private bool IsBusinessSoftwareRunning()
+        private void ExecuteBackup(object parameter)
         {
-            string softwarePath = App.appConfigData.BusinessSoftwarePath;
-            // Check if the business software process is running
-            string processName = Path.GetFileNameWithoutExtension(softwarePath);
-            Process[] processes = Process.GetProcessesByName(processName);
-            foreach (var process in processes)
+            var selectedBackups = BackupTasks.Where(task => task.IsSelected).ToList();
+            var taskToExecute = new List<BackupTaskViewModel>();
+            foreach (var backup in selectedBackups)
             {
-                if (process.MainModule.FileName.Equals(softwarePath, StringComparison.OrdinalIgnoreCase))
+                if (backup.Backup.State.State == "PAUSED")
                 {
-                    return true;
+                    backup.Backup.State.State = "ACTIVE";
+                }
+                else if (backup.Backup.State.State == "INACTIVE" || backup.Backup.State.State == "STOPPED")
+                {
+                    taskToExecute.Add(backup);
                 }
             }
-            return false;
+            if (taskToExecute.Count()>0)
+            {
+                Execute(taskToExecute);
+            }
+        }
+
+        private void PauseBackup(object parameter)
+        {
+            var selectedBackups = BackupTasks.Where(task => task.IsSelected).ToList(); // Get the selected backups
+
+            foreach (var backup in selectedBackups)
+            {
+                backup.Backup.State.State = "PAUSED";
+                Trace.WriteLine("backup paused");
+            }
+        }
+
+        private void StopBackup(object parameter)
+        {
+            var selectedBackups = BackupTasks.Where(task => task.IsSelected).ToList(); // Get the selected backups
+
+            foreach (var backup in selectedBackups)
+            {
+                backup.Backup.State.State = "STOPPED";
+            }
         }
 
 
@@ -179,7 +198,7 @@ namespace easysave.ViewModel
         /// <param name="message"></param>
         private void AppendToConsole(string message)
         {
-            
+
             ConsoleOutput += "> " + message + "\n";
             Console.WriteLine(message);
         }
