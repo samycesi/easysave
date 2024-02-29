@@ -8,7 +8,6 @@ namespace easysave.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-
         private bool isSelected;
         public bool IsSelected
         {

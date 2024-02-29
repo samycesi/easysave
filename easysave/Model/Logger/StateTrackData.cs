@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
@@ -85,6 +86,7 @@ namespace easysave.Model.Logger
         protected virtual void OnStateUpdated()
         {
             StateUpdated?.Invoke(this, EventArgs.Empty);
+            Trace.WriteLine("State updated");
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

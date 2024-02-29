@@ -4,39 +4,35 @@ using Newtonsoft.Json;
 
 namespace easysave.Model
 {
-	public class Config
-	{
-		private string jsonFilePath;
+    public class Config
+    {
+        private string jsonFilePath;
 
-		public Config()
-		{
-			string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName; // Get the solution directory
+        public Config()
+        {
+            string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName; // Get the solution directory
             jsonFilePath = Path.Combine(solutionDir, @"Config\AppConfig.json"); // Combine the solution directory with the path to the JSON file
-		}
+        }
 
-		public AppConfigData LoadFromFile()
-		{
-			if (File.Exists(jsonFilePath))
-			{
-				Console.WriteLine("Loading AppConfigData from file: " + jsonFilePath);
-				string jsonString = File.ReadAllText(jsonFilePath);
+        public AppConfigData LoadFromFile()
+        {
+            if (File.Exists(jsonFilePath))
+            {
+                Console.WriteLine("Loading AppConfigData from file: " + jsonFilePath);
+                string jsonString = File.ReadAllText(jsonFilePath);
                 AppConfigData appconfigdata = JsonConvert.DeserializeObject<AppConfigData>(jsonString);
 
-                // if CryptosoftPath and TasksSavePath are not defined, we initialize them
-                if (appconfigdata.CryptosoftPath.Length == 0 || appconfigdata.SavesPath.Length == 0)
-                {
-                    string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
+                string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
 
-                    appconfigdata.SavesPath = Path.Combine(solutionDir, @"Config\TasksSave.json");
-                    appconfigdata.CryptosoftPath = Path.Combine(solutionDir, @"CRYPTOSOFT\cryptosoft.exe");
+                appconfigdata.SavesPath = Path.Combine(solutionDir, @"Config\TasksSave.json");
+                appconfigdata.CryptosoftPath = Path.Combine(solutionDir, @"CRYPTOSOFT\cryptosoft.exe");
 
-                }
                 return appconfigdata;
             }
-			else
-			{
-				throw new FileNotFoundException("Le fichier JSON spécifié est introuvable.", jsonFilePath);
-			}
-		}
-	}
+            else
+            {
+                throw new FileNotFoundException("Le fichier JSON spécifié est introuvable.", jsonFilePath);
+            }
+        }
+    }
 }
