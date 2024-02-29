@@ -16,9 +16,25 @@ namespace easysave.Model.Logger
         [XmlElement("DateTime")]
         public DateTime DateAndTIme { get; set; }
 
+        private string state;
+
         [JsonProperty(nameof(State))]
         [XmlElement("State")]
-        public string State { get; set; }
+        public string State
+        {
+            get
+            {
+                return state;
+            }
+            set
+            {
+                if (state != value)
+                {
+                    state = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         [JsonProperty(nameof(TotalFilesToCopy))]
         [XmlElement("TotalFilesToCopy")]
@@ -44,11 +60,10 @@ namespace easysave.Model.Logger
         [XmlElement("TargetFilesDirectory")]
         public string TargetFilesDirectory { get; set; }
 
-        
         private int progress;
+
         [JsonProperty(nameof(Progress))]
         [XmlElement("Progress")]
-
         public int Progress
         {
             get

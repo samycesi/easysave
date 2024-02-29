@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Windows.Forms;
-using System.Windows.Input;
 using System.Xml.Serialization;
-
 
 
 namespace easysave.Model.Logger
@@ -38,12 +35,9 @@ namespace easysave.Model.Logger
             backupList.BackupTaskRemoved += HandleBackupTaskRemoved; // Subscribe to the BackupTaskRemoved event
         }
 
-        /// <summary>
-        ///     Subscribes to the StateUpdated event
-        /// </summary>
-        /// <param name="data"></param>
         private void SubscribeToStateUpdatedEvent(StateTrackData data)
         {
+            // Abonnez-vous à l'événement DataUpdated de chaque StateTrackData
             data.StateUpdated += HandleStateUpdated;
         }
 
@@ -70,7 +64,7 @@ namespace easysave.Model.Logger
                     }
                     else
                     {
-                        _stateTrackDataList = JsonSerializer.Deserialize<List<StateTrackData>>(json);
+                        _stateTrackDataList = JsonSerializer.Deserialize<List<StateTrackData>>(json); // Deserialize the file content into _stateTrackDataList
                     }
                 }
                 else if (Path.GetExtension(filePath).ToLower() == ".xml")
@@ -139,7 +133,7 @@ namespace easysave.Model.Logger
 
         private void HandleStateUpdated(object sender, EventArgs e)
         {
-            // When data is updated call SaveStateTrackDataToFile()
+            // Lorsque les données sont mises à jour, appelez la méthode SaveStateTrackDataToFile()
             SaveStateTrackDataToFile();
         }
 
@@ -155,7 +149,7 @@ namespace easysave.Model.Logger
             switch (fileType)
             {
                 case ".xml":
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>)); 
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>));
                     using (StreamWriter writer = new StreamWriter(filePath))
                     {
                         serializer.Serialize(writer, _stateTrackDataList);

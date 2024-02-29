@@ -20,20 +20,19 @@ namespace easysave.Model
 			{
 				Console.WriteLine("Loading AppConfigData from file: " + jsonFilePath);
 				string jsonString = File.ReadAllText(jsonFilePath);
-
                 AppConfigData appconfigdata = JsonConvert.DeserializeObject<AppConfigData>(jsonString);
 
-				// if CryptosoftPath and TasksSavePath are not defined, we initialize them
-				if(appconfigdata.CryptosoftPath.Length == 0 || appconfigdata.SavesPath.Length == 0)
-				{
+                // if CryptosoftPath and TasksSavePath are not defined, we initialize them
+                if (appconfigdata.CryptosoftPath.Length == 0 || appconfigdata.SavesPath.Length == 0)
+                {
                     string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
 
                     appconfigdata.SavesPath = Path.Combine(solutionDir, @"Config\TasksSave.json");
                     appconfigdata.CryptosoftPath = Path.Combine(solutionDir, @"CRYPTOSOFT\cryptosoft.exe");
 
                 }
-				return appconfigdata;
-			}
+                return appconfigdata;
+            }
 			else
 			{
 				throw new FileNotFoundException("Le fichier JSON spécifié est introuvable.", jsonFilePath);

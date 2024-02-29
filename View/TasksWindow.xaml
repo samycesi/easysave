@@ -15,6 +15,7 @@
                     <DataGridTextColumn Header="{DynamicResource Source}" Binding="{Binding Backup.SourceDirectory}" Width="150"/>
                     <DataGridTextColumn Header="{DynamicResource Destination}" Binding="{Binding Backup.DestinationDirectory}" Width="150"/>
                     <DataGridTextColumn Header="{DynamicResource TypeOfBackup}" Binding="{Binding Backup.Type}" Width="100"/>
+                    <DataGridTextColumn Header="State" Binding="{Binding Backup.State.State}" Width="100"/>
                     <DataGridTemplateColumn Header="Progress" Width="250">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -38,6 +39,8 @@
                  Margin="5"/>
 
         <Button Content="{DynamicResource Execute}" Command="{Binding ExecuteBackupCommand}" Margin="5"/>
+        <Button Content="Pause" Command="{Binding PauseBackupCommand}" Margin="5"/>
+        <Button Content="Stop" Command="{Binding StopBackupCommand}" Margin="5"/>
         <Button Content="{DynamicResource Delete}" Command="{Binding DeleteBackupCommand}" Margin="5"/>
         <Button Content="{DynamicResource Refresh}" Command="{Binding RefreshCommand}" Margin="5"/>
     </StackPanel>

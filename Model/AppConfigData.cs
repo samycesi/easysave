@@ -39,6 +39,7 @@ namespace easysave.Model
 
         [JsonProperty("thresholdFileSize")]
         public long ThresholdFileSize { get; set; }
+
         public AppConfigData()
         {
             // Initalize path for the app config data file

@@ -48,6 +48,17 @@ namespace easysave.ViewModel
             }
         }
 
+        private string newBusinessSoftware;
+        public string NewBusinessSoftware
+        {
+            get { return newBusinessSoftware; }
+            set
+            {
+                newBusinessSoftware = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string extensionToEncrypt;
         public string ExtensionToEncrypt
         {
@@ -76,13 +87,13 @@ namespace easysave.ViewModel
             }
         }
 
-        private string newPriorityExtension; 
+        private string newPriorityExtension;
         public string NewPriorityExtension
         {
             get { return newPriorityExtension; }
             set
             {
-                if (newPriorityExtension != value) 
+                if (newPriorityExtension != value)
                 {
                     newPriorityExtension = value;
                     OnPropertyChanged(nameof(NewPriorityExtension));
@@ -103,8 +114,9 @@ namespace easysave.ViewModel
 
         public ICommand BrowseDailyPathCommand { get; }
         public ICommand BrowseStatePathCommand { get; }
+        public ICommand BrowseBusinessSoftwareCommand { get; }
         public ICommand SaveSettingsCommand { get; }
-        public ICommand AddExtensionToListCommand {  get; }
+        public ICommand AddExtensionToListCommand { get; }
         public ICommand RemovePriorityExtensionsFromListCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -125,15 +137,18 @@ namespace easysave.ViewModel
             SelectedExtension = App.appConfigData.LogExtension;
             NewDailyPath = App.appConfigData.DailyPath;
             NewStateTrackPath = App.appConfigData.StateTrackPath;
+            NewBusinessSoftware = App.appConfigData.BusinessSoftwarePath;
             ExtensionToEncrypt = App.appConfigData.FileExtensionToEncrypt;
             ThresholdFileSize = App.appConfigData.ThresholdFileSize;
             PriorityExtensions = PriorityExtensions = new ObservableCollection<PriorityExtensionViewModel>(
-                App.appConfigData.PriorityExtensions.Select(ext => new PriorityExtensionViewModel { 
-                    Extension = ext 
+                App.appConfigData.PriorityExtensions.Select(ext => new PriorityExtensionViewModel
+                {
+                    Extension = ext
                 })
             );
             BrowseDailyPathCommand = new RelayCommand(BrowseDailyPath);
             BrowseStatePathCommand = new RelayCommand(BrowseStatePath);
+            BrowseBusinessSoftwareCommand = new RelayCommand(BrowseBusinessSoftwarePath);
             SaveSettingsCommand = new RelayCommand(SaveSettings);
             AddExtensionToListCommand = new RelayCommand(AddExtensionToList);
             RemovePriorityExtensionsFromListCommand = new RelayCommand(RemovePriorityExtensionsFromList);
@@ -166,6 +181,22 @@ namespace easysave.ViewModel
         }
 
         /// <summary>
+        /// Browse for a new business software file path
+        /// </summary>
+        /// <param name="obj"></param>
+        private void BrowseBusinessSoftwarePath(object obj)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Select Business Software";
+            openFileDialog.Filter = "(*.exe)|*.exe";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                NewBusinessSoftware = openFileDialog.FileName;
+
+            }
+        }
+
+        /// <summary>
         /// Save the settings
         /// </summary>
         /// <param name="obj"></param>
@@ -182,6 +213,7 @@ namespace easysave.ViewModel
             }
 
             SelectedExtension = selectedExtension;
+            App.appConfigData.BusinessSoftwarePath = NewBusinessSoftware;
             App.appConfigData.FileExtensionToEncrypt = ExtensionToEncrypt;
             App.appConfigData.LogExtension = SelectedExtension;
             // Check if dailypath changed 

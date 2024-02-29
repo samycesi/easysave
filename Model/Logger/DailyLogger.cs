@@ -11,7 +11,7 @@ namespace easysave.Model.Logger
         public DailyLogger(string folderPath, string filename) : base(folderPath, filename)
         {
             var fileInfo = new FileInfo(FilePath);
-            
+
             // Initialization of file with empty list
             switch (Path.GetExtension(FilePath))
             {
@@ -28,7 +28,7 @@ namespace easysave.Model.Logger
                     break;
                 case ".json":
                     // Check if file needs to be initialized (created with {} in json)
-                    if(fileInfo.Length == 0 || File.ReadAllText(FilePath) == "{}")
+                    if (fileInfo.Length == 0 || File.ReadAllText(FilePath) == "{}")
                     {
                         List<DailyData> initList = new List<DailyData>();
                         string jsonContent = JsonSerializer.Serialize(initList, new JsonSerializerOptions { WriteIndented = true });
@@ -38,7 +38,7 @@ namespace easysave.Model.Logger
 
             }
 
-            
+
 
         }
 

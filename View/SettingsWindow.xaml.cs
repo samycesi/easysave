@@ -5,7 +5,7 @@ namespace easysave.View
 
     public partial class SettingsWindow : UserControl
     {
-        public SettingsWindow() 
+        public SettingsWindow()
         {
             InitializeComponent();
             // Initialize ComboBoxItems with AppConfig data

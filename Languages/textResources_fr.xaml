@@ -31,5 +31,5 @@
     <system:String x:Key="KiloBytes">Ko</system:String>
     <system:String x:Key="ChooseLanguage">Choisissez la langue (en/fr)</system:String>
     <system:String x:Key="ChooseLogType">Choisissez le type de fichiers log</system:String>
-    
+
 </ResourceDictionary>
