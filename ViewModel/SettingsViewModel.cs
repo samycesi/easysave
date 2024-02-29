@@ -1,8 +1,13 @@
-﻿using easysave.Model.Logger;
+﻿using easysave.Model;
+using easysave.Model.Logger;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 
@@ -10,17 +15,6 @@ namespace easysave.ViewModel
 {
     public class SettingsViewModel : INotifyPropertyChanged
     {
-        private string selectedLanguage;
-        public string SelectedLanguage
-        {
-            get { return selectedLanguage; }
-            set
-            {
-                selectedLanguage = value;
-                OnPropertyChanged();
-            }
-        }
-
         private string selectedExtension;
         public string SelectedExtension
         {
@@ -54,9 +48,64 @@ namespace easysave.ViewModel
             }
         }
 
+        private string extensionToEncrypt;
+        public string ExtensionToEncrypt
+        {
+            get { return extensionToEncrypt; }
+            set
+            {
+                if (extensionToEncrypt != value)
+                {
+                    extensionToEncrypt = value;
+                    OnPropertyChanged(nameof(ExtensionToEncrypt));
+                }
+            }
+        }
+
+        private long thresholdFileSize;
+        public long ThresholdFileSize
+        {
+            get { return thresholdFileSize; }
+            set
+            {
+                if (thresholdFileSize != value)
+                {
+                    thresholdFileSize = value;
+                    OnPropertyChanged(nameof(ThresholdFileSize));
+                }
+            }
+        }
+
+        private string newPriorityExtension; 
+        public string NewPriorityExtension
+        {
+            get { return newPriorityExtension; }
+            set
+            {
+                if (newPriorityExtension != value) 
+                {
+                    newPriorityExtension = value;
+                    OnPropertyChanged(nameof(NewPriorityExtension));
+                }
+            }
+        }
+
+        private ObservableCollection<PriorityExtensionViewModel> priorityExtensions;
+        public ObservableCollection<PriorityExtensionViewModel> PriorityExtensions
+        {
+            get { return priorityExtensions; }
+            set
+            {
+                priorityExtensions = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand BrowseDailyPathCommand { get; }
         public ICommand BrowseStatePathCommand { get; }
         public ICommand SaveSettingsCommand { get; }
+        public ICommand AddExtensionToListCommand {  get; }
+        public ICommand RemovePriorityExtensionsFromListCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -73,14 +122,21 @@ namespace easysave.ViewModel
             this.dailyLogger = dailyLogger;
             this.stateTrackLogger = stateTrackLogger;
 
-            SelectedLanguage = App.appConfigData.Language;
             SelectedExtension = App.appConfigData.LogExtension;
             NewDailyPath = App.appConfigData.DailyPath;
             NewStateTrackPath = App.appConfigData.StateTrackPath;
-
+            ExtensionToEncrypt = App.appConfigData.FileExtensionToEncrypt;
+            ThresholdFileSize = App.appConfigData.ThresholdFileSize;
+            PriorityExtensions = PriorityExtensions = new ObservableCollection<PriorityExtensionViewModel>(
+                App.appConfigData.PriorityExtensions.Select(ext => new PriorityExtensionViewModel { 
+                    Extension = ext 
+                })
+            );
             BrowseDailyPathCommand = new RelayCommand(BrowseDailyPath);
             BrowseStatePathCommand = new RelayCommand(BrowseStatePath);
             SaveSettingsCommand = new RelayCommand(SaveSettings);
+            AddExtensionToListCommand = new RelayCommand(AddExtensionToList);
+            RemovePriorityExtensionsFromListCommand = new RelayCommand(RemovePriorityExtensionsFromList);
         }
 
         /// <summary>
@@ -115,16 +171,6 @@ namespace easysave.ViewModel
         /// <param name="obj"></param>
         private void SaveSettings(object obj)
         {
-            string selectedLanguage;
-            if (SelectedLanguage.ToLower().Contains("english"))
-            {
-                selectedLanguage = "en";
-            }
-            else
-            {
-                selectedLanguage = "fr";
-            }
-            SelectedLanguage = selectedLanguage;
             string selectedExtension;
             if (SelectedExtension.ToLower().Contains("json"))
             {
@@ -134,20 +180,33 @@ namespace easysave.ViewModel
             {
                 selectedExtension = ".xml";
             }
+
             SelectedExtension = selectedExtension;
-            App.appConfigData.Language = SelectedLanguage;
+            App.appConfigData.FileExtensionToEncrypt = ExtensionToEncrypt;
             App.appConfigData.LogExtension = SelectedExtension;
-            App.appConfigData.DailyPath = NewDailyPath;
-            App.appConfigData.StateTrackPath = NewStateTrackPath;
+            // Check if dailypath changed 
+            if (!App.appConfigData.DailyPath.Equals(NewDailyPath))
+            {
+                ChangeLogPath(NewDailyPath, dailyLogger);
+                App.appConfigData.DailyPath = NewDailyPath;
+            }
+            // Check if 
+            if (!App.appConfigData.StateTrackPath.Equals(NewStateTrackPath))
+            {
+                ChangeLogPath(NewStateTrackPath, stateTrackLogger);
+                App.appConfigData.StateTrackPath = NewStateTrackPath;
+            }
+            App.appConfigData.ThresholdFileSize = ThresholdFileSize;
+            App.appConfigData.PriorityExtensions = PriorityExtensions.Select(item => item.Extension).ToArray();
+
             App.appConfigData.SaveToFile();
             Console.WriteLine("Settings saved");
             Console.WriteLine("Language: " + App.appConfigData.Language);
             Console.WriteLine("Log extension: " + App.appConfigData.LogExtension);
             Console.WriteLine("Daily path: " + App.appConfigData.DailyPath);
             Console.WriteLine("State track path: " + App.appConfigData.StateTrackPath);
-
-            ChangeLogPath(NewDailyPath, dailyLogger);
-            ChangeLogPath(NewStateTrackPath, stateTrackLogger);
+            Console.WriteLine("Threshold file size : " + App.appConfigData.ThresholdFileSize);
+            Console.WriteLine("Priority extensions : " + App.appConfigData.PriorityExtensions);
             ChangeLogTypes(SelectedExtension);
         }
 
@@ -193,7 +252,7 @@ namespace easysave.ViewModel
                         break;
                 }
             }
-            UpdateConfigLogs();
+            // UpdateConfigLogs();
             UpdateConfigLogType(newType);
         }
 
@@ -207,6 +266,7 @@ namespace easysave.ViewModel
             App.appConfigData.StateTrackPath = stateTrackLogger.FolderPath;
             Console.WriteLine("Daily path: " + App.appConfigData.DailyPath);
             Console.WriteLine("State track path: " + App.appConfigData.StateTrackPath);
+            // ICI CA ERASE LES LOGS
             App.appConfigData.SaveToFile();
         }
 
@@ -218,6 +278,29 @@ namespace easysave.ViewModel
         {
             App.appConfigData.LogExtension = newType;
             App.appConfigData.SaveToFile();
+        }
+
+        private void AddExtensionToList(object obj)
+        {
+            if (!string.IsNullOrEmpty(NewPriorityExtension))
+            {
+                PriorityExtensionViewModel newPriorityExtensionItem = new PriorityExtensionViewModel
+                {
+                    Extension = NewPriorityExtension
+                };
+
+                PriorityExtensions.Add(newPriorityExtensionItem);
+
+                NewPriorityExtension = string.Empty;
+            }
+        }
+        private void RemovePriorityExtensionsFromList(object obj)
+        {
+            var elementsASupprimer = PriorityExtensions.Where(e => e.IsPrioritySelected).ToList();
+            foreach (var element in elementsASupprimer)
+            {
+                PriorityExtensions.Remove(element);
+            }
         }
     }
 }

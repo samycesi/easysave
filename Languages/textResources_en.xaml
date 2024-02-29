@@ -25,5 +25,11 @@
     <system:String x:Key="StatePath">Real-time log path</system:String>
     <system:String x:Key="Save">Save</system:String>
     <system:String x:Key="SuccessfullyCreated">Task created successfully</system:String>
+    <system:String x:Key="AddExtensionBtn">>> Add >></system:String>
+    <system:String x:Key="ExtensionToEncrypt">Extension to Encrypt</system:String>
+    <system:String x:Key="ThresholdFileSize">Threshold File Size</system:String>
+    <system:String x:Key="KiloBytes">KB</system:String>
+    <system:String x:Key="ChooseLanguage">Choose a language (en/fr)</system:String>
+    <system:String x:Key="ChooseLogType">Choose the type of log files</system:String>
 
 </ResourceDictionary>

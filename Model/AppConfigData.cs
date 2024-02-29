@@ -41,11 +41,9 @@ namespace easysave.Model
         public long ThresholdFileSize { get; set; }
         public AppConfigData()
         {
+            // Initalize path for the app config data file
             string solutionDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
             jsonFilePath = Path.Combine(solutionDir, @"Config\AppConfig.json");
-            SavesPath = Path.Combine(solutionDir, @"Config\TasksSave.json");
-            CryptosoftPath = Path.Combine(solutionDir, @"CRYPTOSOFT\cryptosoft.exe");
-            SaveToFile();
         }
 
         public void SaveToFile()

@@ -3,8 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Windows.Forms;
+using System.Windows.Input;
 using System.Xml.Serialization;
-using Newtonsoft.Json;
+
 
 
 namespace easysave.Model.Logger
@@ -35,9 +38,12 @@ namespace easysave.Model.Logger
             backupList.BackupTaskRemoved += HandleBackupTaskRemoved; // Subscribe to the BackupTaskRemoved event
         }
 
+        /// <summary>
+        ///     Subscribes to the StateUpdated event
+        /// </summary>
+        /// <param name="data"></param>
         private void SubscribeToStateUpdatedEvent(StateTrackData data)
         {
-            // Abonnez-vous à l'événement DataUpdated de chaque StateTrackData
             data.StateUpdated += HandleStateUpdated;
         }
 
@@ -64,7 +70,7 @@ namespace easysave.Model.Logger
                     }
                     else
                     {
-                        _stateTrackDataList = JsonConvert.DeserializeObject<List<StateTrackData>>(json); // Deserialize the file content into _stateTrackDataList
+                        _stateTrackDataList = JsonSerializer.Deserialize<List<StateTrackData>>(json);
                     }
                 }
                 else if (Path.GetExtension(filePath).ToLower() == ".xml")
@@ -133,7 +139,7 @@ namespace easysave.Model.Logger
 
         private void HandleStateUpdated(object sender, EventArgs e)
         {
-            // Lorsque les données sont mises à jour, appelez la méthode SaveStateTrackDataToFile()
+            // When data is updated call SaveStateTrackDataToFile()
             SaveStateTrackDataToFile();
         }
 
@@ -149,14 +155,14 @@ namespace easysave.Model.Logger
             switch (fileType)
             {
                 case ".xml":
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>));
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>)); 
                     using (StreamWriter writer = new StreamWriter(filePath))
                     {
                         serializer.Serialize(writer, _stateTrackDataList);
                     }
                     break;
                 case ".json":
-                    string json = JsonConvert.SerializeObject(_stateTrackDataList, Formatting.Indented);
+                    string json = JsonSerializer.Serialize(_stateTrackDataList, new JsonSerializerOptions { WriteIndented = true });
                     File.WriteAllText(filePath, json);
                     break;
             }
@@ -167,13 +173,18 @@ namespace easysave.Model.Logger
         /// </summary>
         public void ConvertJSONtoXML()
         {
-            string filePath = FilePath;
-            string json = File.ReadAllText(filePath);
-            List<StateTrackData> stateTrackDataList = JsonConvert.DeserializeObject<List<StateTrackData>>(json); // Deserialize the file content into stateTrackDataList
+            // From Json
+            string json = File.ReadAllText(FilePath);
+            // Deserialize the file content into stateTrackDataList
+            List<StateTrackData> stateTrackDataList = JsonSerializer.Deserialize<List<StateTrackData>>(json);
+            // Delete old file
+            File.Delete(FilePath);
+            // New File Path
+            FilePath = Path.ChangeExtension(FilePath, ".xml");
 
             // Serialize the stateTrackDataList and save it to the file
             XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>));
-            using (StreamWriter writer = new StreamWriter(filePath))
+            using (StreamWriter writer = new StreamWriter(FilePath))
             {
                 serializer.Serialize(writer, stateTrackDataList);
             }
@@ -184,13 +195,22 @@ namespace easysave.Model.Logger
         /// </summary>
         public void ConvertXMLtoJSON()
         {
-            string filePath = FilePath;
-            XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>));
-            using (StreamReader reader = new StreamReader(filePath))
+            List<StateTrackData> myDataList;
+            var serializer = new XmlSerializer(typeof(List<StateTrackData>));
+            if (File.Exists(FilePath))
             {
-                List<StateTrackData> stateTrackDataList = (List<StateTrackData>)serializer.Deserialize(reader);
-                string json = JsonConvert.SerializeObject(stateTrackDataList, Formatting.Indented);
-                File.WriteAllText(filePath, json);
+                // From Xml
+                using (var reader = new StreamReader(FilePath))
+                {
+                    myDataList = (List<StateTrackData>)serializer.Deserialize(reader);
+                }
+                // Delete old file
+                File.Delete(FilePath);
+                // New File Path
+                FilePath = Path.ChangeExtension(FilePath, ".json");
+                // TO JSON
+                string convertedJSON = JsonSerializer.Serialize(myDataList, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(this.FilePath, convertedJSON);
             }
         }
     }

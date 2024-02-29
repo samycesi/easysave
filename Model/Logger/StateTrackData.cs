@@ -44,7 +44,10 @@ namespace easysave.Model.Logger
         [XmlElement("TargetFilesDirectory")]
         public string TargetFilesDirectory { get; set; }
 
+        
         private int progress;
+        [JsonProperty(nameof(Progress))]
+        [XmlElement("Progress")]
 
         public int Progress
         {
@@ -81,6 +84,10 @@ namespace easysave.Model.Logger
             this.Name = name;
             this.State = "INACTIVE";
             this.Progress = 0;
+        }
+
+        public StateTrackData()
+        {
         }
 
         public void Init(string state, long totalFilesToCopy, long totalFilesSize, long filesLeftToDo, long fileSizeLeftToDo, string sourceFileDirectory, string targetFileDirectory)
