@@ -60,6 +60,7 @@ namespace easysave.ViewModel
         {
             BackupList = new BackupList();
 
+
             DailyLogger = new DailyLogger(App.appConfigData.DailyPath, DateTime.Today.ToString("yyyy-MM-dd") + App.appConfigData.LogExtension);
             StateTrackLogger = new StateTrackLogger(App.appConfigData.StateTrackPath, "state" + App.appConfigData.LogExtension, BackupList);
 

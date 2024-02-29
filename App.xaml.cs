@@ -1,4 +1,4 @@
-﻿using Easysave.Model;
+﻿using easysave.Model;
 using System.Windows;
 
 namespace easysave

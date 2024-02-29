@@ -10,24 +10,38 @@ namespace easysave.Model.Logger
     {
         public DailyLogger(string folderPath, string filename) : base(folderPath, filename)
         {
-            // initialization of file with empty list
+            var fileInfo = new FileInfo(FilePath);
+            
+            // Initialization of file with empty list
             switch (Path.GetExtension(FilePath))
             {
                 case ".xml":
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<DailyData>));
-                    using (TextWriter writer = new StreamWriter(FilePath))
+                    // Check if file needs to be initialized (created empty in xml)
+                    if (fileInfo.Length == 0)
                     {
-                        serializer.Serialize(writer, new List<DailyData>());
+                        XmlSerializer serializer = new XmlSerializer(typeof(List<DailyData>));
+                        using (TextWriter writer = new StreamWriter(FilePath))
+                        {
+                            serializer.Serialize(writer, new List<DailyData>());
+                        }
                     }
                     break;
                 case ".json":
-                    List<DailyData> initList = new List<DailyData>();
-                    string jsonContent = JsonSerializer.Serialize(initList, new JsonSerializerOptions { WriteIndented = true });
-                    File.WriteAllText(FilePath, jsonContent);
+                    // Check if file needs to be initialized (created with {} in json)
+                    if(fileInfo.Length == 0 || File.ReadAllText(FilePath) == "{}")
+                    {
+                        List<DailyData> initList = new List<DailyData>();
+                        string jsonContent = JsonSerializer.Serialize(initList, new JsonSerializerOptions { WriteIndented = true });
+                        File.WriteAllText(FilePath, jsonContent);
+                    }
                     break;
+
             }
+
+            
+
         }
-        
+
         /// <summary>
         /// Write the daily log in the file (XML)
         /// </summary>
@@ -77,8 +91,7 @@ namespace easysave.Model.Logger
             var serializer = new XmlSerializer(typeof(List<DailyData>));
             if (File.Exists(FilePath))
             {
-                // FROM XML 
-
+                // From xml
                 using (var reader = new StreamReader(FilePath))
                 {
                     myDataList = (List<DailyData>)serializer.Deserialize(reader);
@@ -86,7 +99,7 @@ namespace easysave.Model.Logger
                 File.Delete(FilePath);
                 // New File Path
                 FilePath = Path.ChangeExtension(FilePath, ".json");
-                // TO JSON
+                // To json
                 string convertedJSON = JsonSerializer.Serialize(myDataList, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(this.FilePath, convertedJSON);
             }
@@ -101,12 +114,13 @@ namespace easysave.Model.Logger
             var serializer = new XmlSerializer(typeof(List<DailyData>));
             if (File.Exists(FilePath))
             {
-                // FROM JSON
+                // From json
                 myDataList = JsonSerializer.Deserialize<List<DailyData>>(File.ReadAllText(this.FilePath));
+                // Delete Old file
                 File.Delete(FilePath);
                 // New File Path
                 FilePath = Path.ChangeExtension(FilePath, ".xml");
-                // TO XML
+                // To xml
                 using (StringWriter writer = new StringWriter())
                 {
                     serializer.Serialize(writer, myDataList);

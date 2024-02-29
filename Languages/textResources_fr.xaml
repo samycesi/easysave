@@ -25,5 +25,11 @@
     <system:String x:Key="StatePath">Chemin du fichier de log en temps réel</system:String>
     <system:String x:Key="Save">Enregistrer</system:String>
     <system:String x:Key="SuccessfullyCreated">Travail de sauvegarde crée avec succès</system:String>
-
+    <system:String x:Key="AddExtensionBtn">>> Ajouter >></system:String>
+    <system:String x:Key="ExtensionToEncrypt">Extension à Chiffrer</system:String>
+    <system:String x:Key="ThresholdFileSize">Seuil de taille de fichier volumineux</system:String>
+    <system:String x:Key="KiloBytes">Ko</system:String>
+    <system:String x:Key="ChooseLanguage">Choisissez la langue (en/fr)</system:String>
+    <system:String x:Key="ChooseLogType">Choisissez le type de fichiers log</system:String>
+    
 </ResourceDictionary>

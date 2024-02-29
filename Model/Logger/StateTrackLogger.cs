@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Windows.Forms;
+using System.Windows.Input;
 using System.Xml.Serialization;
-using Newtonsoft.Json;
+
 
 
 namespace easysave.Model.Logger
@@ -20,6 +22,10 @@ namespace easysave.Model.Logger
             _stateTrackDataList = new List<StateTrackData>();
             SubscribeToBackupListEvents(backupList); // Subscribe to BackupList events
             Init(backupList.BackupTasks); // Initialize the state log with the current backup tasks
+            foreach (var stateTrackData in _stateTrackDataList)
+            {
+                SubscribeToStateUpdatedEvent(stateTrackData); // Subscribe to the DataUpdated event of each StateTrackData
+            }
         }
 
         /// <summary>
@@ -30,6 +36,15 @@ namespace easysave.Model.Logger
         {
             backupList.BackupTaskAdded += HandleBackupTaskAdded; // Subscribe to the BackupTaskAdded event
             backupList.BackupTaskRemoved += HandleBackupTaskRemoved; // Subscribe to the BackupTaskRemoved event
+        }
+
+        /// <summary>
+        ///     Subscribes to the StateUpdated event
+        /// </summary>
+        /// <param name="data"></param>
+        private void SubscribeToStateUpdatedEvent(StateTrackData data)
+        {
+            data.StateUpdated += HandleStateUpdated;
         }
 
         /// <summary>
@@ -50,13 +65,12 @@ namespace easysave.Model.Logger
                     {
                         foreach (var backupTask in backupTasks.Values)
                         {
-                            StateTrackData taskData = new StateTrackData(backupTask.Name, DateTime.Now, "INACTIVE", 0, 0, 0, 0, "", "");
-                            _stateTrackDataList.Add(taskData); // Add the default data to the list
+                            _stateTrackDataList.Add(backupTask.State); // Add the default data to the list
                         }
                     }
                     else
                     {
-                        _stateTrackDataList = JsonConvert.DeserializeObject<List<StateTrackData>>(json); // Deserialize the file content into _stateTrackDataList
+                        _stateTrackDataList = JsonSerializer.Deserialize<List<StateTrackData>>(json);
                     }
                 }
                 else if (Path.GetExtension(filePath).ToLower() == ".xml")
@@ -65,8 +79,7 @@ namespace easysave.Model.Logger
                     {
                         foreach (var backupTask in backupTasks.Values)
                         {
-                            StateTrackData taskData = new StateTrackData(backupTask.Name, DateTime.Now, "INACTIVE", 0, 0, 0, 0, "", "");
-                            _stateTrackDataList.Add(taskData); // Add the default data to the list
+                            _stateTrackDataList.Add(backupTask.State); // Add the default data to the list
                         }
                     }
                     else
@@ -84,8 +97,7 @@ namespace easysave.Model.Logger
                 // Add the default data to the list
                 foreach (var backupTask in backupTasks.Values)
                 {
-                    StateTrackData taskData = new StateTrackData(backupTask.Name, DateTime.Now, "INACTIVE", 0, 0, 0, 0, "", "");
-                    _stateTrackDataList.Add(taskData);
+                    _stateTrackDataList.Add(backupTask.State);
                 }
             }
         }
@@ -98,7 +110,7 @@ namespace easysave.Model.Logger
         private void HandleBackupTaskAdded(object sender, BackupEvent e)
         {
             // Create a new StateTrackData object with the default values
-            StateTrackData taskData = new StateTrackData(e.BackupTask.Name, DateTime.Now, "INACTIVE", 0, 0, 0, 0, "", "");
+            StateTrackData taskData = e.BackupTask.State;
 
             // Add the new StateTrackData object to the list
             _stateTrackDataList.Add(taskData);
@@ -125,6 +137,12 @@ namespace easysave.Model.Logger
             }
         }
 
+        private void HandleStateUpdated(object sender, EventArgs e)
+        {
+            // When data is updated call SaveStateTrackDataToFile()
+            SaveStateTrackDataToFile();
+        }
+
         /// <summary>
         ///    Saves the state track data to the file
         /// </summary>
@@ -137,69 +155,16 @@ namespace easysave.Model.Logger
             switch (fileType)
             {
                 case ".xml":
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>));
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>)); 
                     using (StreamWriter writer = new StreamWriter(filePath))
                     {
                         serializer.Serialize(writer, _stateTrackDataList);
                     }
                     break;
                 case ".json":
-                    string json = JsonConvert.SerializeObject(_stateTrackDataList, Formatting.Indented);
+                    string json = JsonSerializer.Serialize(_stateTrackDataList, new JsonSerializerOptions { WriteIndented = true });
                     File.WriteAllText(filePath, json);
                     break;
-            }
-        }
-
-
-        /// <summary>
-        ///     Updates the real time log file of an active task
-        /// </summary>
-        /// <param name="totalFilesToCopy"></param>
-        /// <param name="totalFilesSize"></param>
-        /// <param name="filesLeftToDo"></param>
-        /// <param name="fileSizeLeftToDo"></param>
-        /// <param name="sourceFileDirectory"></param>
-        /// <param name="targetFileDirectory"></param>
-        /// <param name="name"></param>
-        public void UpdateActive(long totalFilesToCopy, long totalFilesSize, long filesLeftToDo, long fileSizeLeftToDo, string sourceFileDirectory, string targetFileDirectory, string name)
-        {
-            // Find the corresponding StateTrackData object to the active task
-            StateTrackData taskToUpdate = _stateTrackDataList.FirstOrDefault(task => task.Name == name);
-            if (taskToUpdate != null)
-            {
-                // Update the properties of the StateTrackData object
-                taskToUpdate.DateAndTIme = DateTime.Now;
-                taskToUpdate.State = "ACTIVE";
-                taskToUpdate.TotalFilesToCopy = totalFilesToCopy;
-                taskToUpdate.TotalFilesSize = totalFilesSize;
-                taskToUpdate.FilesLeftToDo = filesLeftToDo;
-                taskToUpdate.SizeFilesLeftToDo = fileSizeLeftToDo;
-                taskToUpdate.SourceFileDirectory = sourceFileDirectory;
-                taskToUpdate.TargetFilesDirectory = targetFileDirectory;
-
-                // Save the changes to the file
-                SaveStateTrackDataToFile();
-            }
-        }
-
-        public void UpdateInactive(string name)
-        {
-            // Find the corresponding StateTrackData object to the inactive task
-            StateTrackData taskToUpdate = _stateTrackDataList.FirstOrDefault(task => task.Name == name);
-            if (taskToUpdate != null)
-            {
-                // Mettez � jour les propri�t�s de l'objet StateTrackData
-                taskToUpdate.DateAndTIme = DateTime.Now;
-                taskToUpdate.State = "INACTIVE";
-                taskToUpdate.TotalFilesToCopy = 0;
-                taskToUpdate.TotalFilesSize = 0;
-                taskToUpdate.FilesLeftToDo = 0;
-                taskToUpdate.SizeFilesLeftToDo = 0;
-                taskToUpdate.SourceFileDirectory = "";
-                taskToUpdate.TargetFilesDirectory = "";
-
-                // Save the changes to the file
-                SaveStateTrackDataToFile();
             }
         }
 
@@ -208,13 +173,18 @@ namespace easysave.Model.Logger
         /// </summary>
         public void ConvertJSONtoXML()
         {
-            string filePath = FilePath;
-            string json = File.ReadAllText(filePath);
-            List<StateTrackData> stateTrackDataList = JsonConvert.DeserializeObject<List<StateTrackData>>(json); // Deserialize the file content into stateTrackDataList
+            // From Json
+            string json = File.ReadAllText(FilePath);
+            // Deserialize the file content into stateTrackDataList
+            List<StateTrackData> stateTrackDataList = JsonSerializer.Deserialize<List<StateTrackData>>(json);
+            // Delete old file
+            File.Delete(FilePath);
+            // New File Path
+            FilePath = Path.ChangeExtension(FilePath, ".xml");
 
             // Serialize the stateTrackDataList and save it to the file
             XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>));
-            using (StreamWriter writer = new StreamWriter(filePath))
+            using (StreamWriter writer = new StreamWriter(FilePath))
             {
                 serializer.Serialize(writer, stateTrackDataList);
             }
@@ -225,13 +195,22 @@ namespace easysave.Model.Logger
         /// </summary>
         public void ConvertXMLtoJSON()
         {
-            string filePath = FilePath;
-            XmlSerializer serializer = new XmlSerializer(typeof(List<StateTrackData>));
-            using (StreamReader reader = new StreamReader(filePath))
+            List<StateTrackData> myDataList;
+            var serializer = new XmlSerializer(typeof(List<StateTrackData>));
+            if (File.Exists(FilePath))
             {
-                List<StateTrackData> stateTrackDataList = (List<StateTrackData>)serializer.Deserialize(reader);
-                string json = JsonConvert.SerializeObject(stateTrackDataList, Formatting.Indented);
-                File.WriteAllText(filePath, json);
+                // From Xml
+                using (var reader = new StreamReader(FilePath))
+                {
+                    myDataList = (List<StateTrackData>)serializer.Deserialize(reader);
+                }
+                // Delete old file
+                File.Delete(FilePath);
+                // New File Path
+                FilePath = Path.ChangeExtension(FilePath, ".json");
+                // TO JSON
+                string convertedJSON = JsonSerializer.Serialize(myDataList, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(this.FilePath, convertedJSON);
             }
         }
     }

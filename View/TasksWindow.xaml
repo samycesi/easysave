@@ -3,28 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:easysave.View"
+             xmlns:local="clr-namespace:easysave.View" xmlns:viewmodel="clr-namespace:easysave.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:TaskViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="800">
+             d:DesignHeight="600" d:DesignWidth="810">
+
     <StackPanel>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="300">
-            <ListView ItemsSource="{Binding BackupTasks}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="{DynamicResource Select}">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="{DynamicResource Name}" DisplayMemberBinding="{Binding Backup.Name}" Width="120"/>
-                        <GridViewColumn Header="{DynamicResource Source}" DisplayMemberBinding="{Binding Backup.SourceDirectory}" Width="150"/>
-                        <GridViewColumn Header="{DynamicResource Destination}" DisplayMemberBinding="{Binding Backup.DestinationDirectory}" Width="150"/>
-                        <GridViewColumn Header="{DynamicResource TypeOfBackup}" DisplayMemberBinding="{Binding Backup.Type}" Width="100"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="250">
+            <DataGrid ItemsSource="{Binding BackupTasks}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Extended">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding Backup.Name}" Width="120"/>
+                    <DataGridTextColumn Header="{DynamicResource Source}" Binding="{Binding Backup.SourceDirectory}" Width="150"/>
+                    <DataGridTextColumn Header="{DynamicResource Destination}" Binding="{Binding Backup.DestinationDirectory}" Width="150"/>
+                    <DataGridTextColumn Header="{DynamicResource TypeOfBackup}" Binding="{Binding Backup.Type}" Width="100"/>
+                    <DataGridTemplateColumn Header="Progress" Width="250">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ProgressBar Value="{Binding Backup.State.Progress}" Minimum="0" Maximum="100"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    </Style>
+                </DataGrid.RowStyle>
+            </DataGrid>
+
         </ScrollViewer>
 
         <TextBox Style="{StaticResource TerminalTextBoxStyle}" 

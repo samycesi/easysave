@@ -1,6 +1,4 @@
-﻿using easysave.View;
-using easysave.ViewModel;
-using Easysave.Model;
+﻿using easysave.ViewModel;
 using System.Globalization;
 using System.Resources;
 using System.Windows;
@@ -24,7 +22,25 @@ namespace easysave
             SetLanguage(App.appConfigData.Language);
             viewModel = new MainViewModel();
             DataContext = viewModel;
+
+            switch (App.appConfigData.Language)
+            {
+                case "en":
+                    EnglishButton.IsChecked = true;
+                    FrenchButton.IsChecked = false;
+                    break;
+                case "fr":
+                    EnglishButton.IsChecked = false;
+                    FrenchButton.IsChecked = true;
+                    break;
+                default:
+                    // Langue par défaut si la valeur dans AppConfigData n'est ni "en" ni "fr"
+                    EnglishButton.IsChecked = true;
+                    FrenchButton.IsChecked = false;
+                    break;
+            }
         }
+
 
         /// <summary>
         /// Set the language of the application

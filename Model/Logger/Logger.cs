@@ -13,7 +13,10 @@ namespace easysave.Model.Logger
             this.FolderPath = folderPath;
             string filePath = Path.Combine(folderPath, fileName);
             this.FilePath = filePath;
-            CreateFile();
+            if (!File.Exists(FilePath))
+            {
+                CreateFile();
+            }
         }
 
         /// <summary>

@@ -4,16 +4,21 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows.Input;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Diagnostics;
 using System.IO;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace easysave.ViewModel
 {
     public class TaskViewModel : INotifyPropertyChanged
     {
+        public static Barrier barrierPrio = new Barrier(0);
+        public static Mutex mutex = new Mutex();
+        public static CountdownEvent countdownEvent = new CountdownEvent(0);
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private BackupList backupList;
@@ -25,7 +30,8 @@ namespace easysave.ViewModel
         public RelayCommand RefreshCommand { get; }
 
         public DailyLogger DailyLogger { get; set; }
-        public StateTrackLogger StateTrackLogger { get; set; }
+
+        private AutoResetEvent fileAccessEvent = new AutoResetEvent(true);
 
         private string _consoleOutput;
 
@@ -48,7 +54,6 @@ namespace easysave.ViewModel
             RefreshCommand = new RelayCommand(RefreshBackupTasks);
 
             this.DailyLogger = MainViewModel.DailyLogger;
-            this.StateTrackLogger = MainViewModel.StateTrackLogger;
         }
 
         /// <summary>
@@ -58,40 +63,65 @@ namespace easysave.ViewModel
         private void ExecuteBackup(object parameter)
         {
             var selectedBackups = BackupTasks.Where(task => task.IsSelected).ToList(); // Get the selected backups
-            foreach (var backup in selectedBackups)
+
+            List<Task> backupTasks = new List<Task>();
+
+            // Add the participants to the barrier (= the amount of selected backups)
+            barrierPrio.AddParticipants(selectedBackups.Count);
+
+            // Initialize or increment CountDownEvent to make sure backups are waiting for the priority files to be copied after the barrier
+            if (countdownEvent == null || countdownEvent.IsSet)
             {
-                // Check if the calculator process is running
-                while (IsBusinessSoftwareRunning())
+                countdownEvent = new CountdownEvent(selectedBackups.Count);
+            }
+            else
+            {
+                countdownEvent.AddCount(selectedBackups.Count);
+            }
+
+            foreach (var backup in selectedBackups)
+            { 
+                Task task = Task.Run(() =>
                 {
-                    // Log a message indicating that the backup execution is paused
-                    string pauseMessage = "Backup execution paused because the business software is running";
-                    AppendToConsole(pauseMessage);
+                    // Check if the business software process is running
+                    while (IsBusinessSoftwareRunning())
+                    {
+                        // Log a message indicating that the backup execution is paused
+                        string pauseMessage = "Backup execution paused because the business software is running";
+                        AppendToConsole(pauseMessage);
 
-                    // Sleep for a short duration before checking again
-                    Thread.Sleep(1000); // Sleep for 1 second (adjust as needed)
-                }
+                        // Sleep for a short duration before checking again
+                        Thread.Sleep(1000); // Sleep for 1 second (adjust as needed)
+                    }
 
-                // Log the backup execution in the console
-                string logMessage = $"Task {backup.Backup.Name} launched";
-                AppendToConsole(logMessage);
+                    // Log the backup execution in the console
+                    string logMessage = $"Task {backup.Backup.Name} launched";
+                    AppendToConsole(logMessage);
 
-                // Execute the backup
-                (BackupModel task, long fileSize, long fileTransferTime, long totalEncryptionTime) = backupList.ExecuteTaskByKey(backup.Key, StateTrackLogger);
+                    // Execute the backup
+                    (BackupModel task, long fileSize, long fileTransferTime, long totalEncryptionTime) = backupList.ExecuteTaskByKey(backup.Key);
 
-                // Log the backup execution in the daily log
-                switch (App.appConfigData.LogExtension)
-                {
-                    case ".json":
-                        DailyLogger.WriteDailyLogJSON(task, fileSize, fileTransferTime, totalEncryptionTime);
-                        break;
-                    case ".xml":
-                        DailyLogger.WriteDailyLogXML(task, fileSize, fileTransferTime, totalEncryptionTime);
-                        break;
-                }
+                    // Log the backup execution in the daily log
+                    switch (App.appConfigData.LogExtension)
+                    {
+                        case ".json":
+                            fileAccessEvent.WaitOne();
+                            DailyLogger.WriteDailyLogJSON(task, fileSize, fileTransferTime, totalEncryptionTime);
+                            fileAccessEvent.Set();
+                            break;
+                        case ".xml":
+                            fileAccessEvent.WaitOne();
+                            DailyLogger.WriteDailyLogXML(task, fileSize, fileTransferTime, totalEncryptionTime);
+                            fileAccessEvent.Set();
+                            break;
+                    }
 
-                // Log the backup execution in the console
-                logMessage = $"Task {task.Name} finished successfully in {fileTransferTime}ms";
-                AppendToConsole(logMessage);
+                    // Log the backup execution in the console
+                    logMessage = $"Task {task.Name} finished successfully in {fileTransferTime}ms";
+                    AppendToConsole(logMessage);
+                });
+
+                backupTasks.Add(task);
             }
         }
 
@@ -149,7 +179,9 @@ namespace easysave.ViewModel
         /// <param name="message"></param>
         private void AppendToConsole(string message)
         {
+            
             ConsoleOutput += "> " + message + "\n";
+            Console.WriteLine(message);
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

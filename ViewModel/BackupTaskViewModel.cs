@@ -1,10 +1,6 @@
 ﻿using easysave.Model;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace easysave.ViewModel
 {
@@ -20,6 +16,7 @@ namespace easysave.ViewModel
             {
                 isSelected = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+                Console.WriteLine("IsSelected: " + value);
             }
         }
 
