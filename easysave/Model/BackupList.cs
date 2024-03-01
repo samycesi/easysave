@@ -139,7 +139,7 @@ namespace easysave.Model
                 {
                     BusinessRunningPause(task);
                 }
-                if (file_info.Length > thresholdFileSize)
+                if (file_info.Length > thresholdFileSize*1000)
                 {
                     try
                     {
@@ -187,7 +187,7 @@ namespace easysave.Model
                 {
                     BusinessRunningPause(task);
                 }
-                if (file_info.Length > thresholdFileSize)
+                if (file_info.Length > thresholdFileSize*1000)
                 {
                     try
                     {
