@@ -10,6 +10,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/MenuStyle.xaml"/>
                 <ResourceDictionary Source="Styles/TerminalStyle.xaml"/>
+                <ResourceDictionary Source="Languages/textResources_fr.xaml"/>
+                <ResourceDictionary Source="Languages/textResources_en.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type viewModel:ConfigViewModel}">

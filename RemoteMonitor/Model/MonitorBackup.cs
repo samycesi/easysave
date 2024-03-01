@@ -6,6 +6,7 @@ namespace RemoteMonitor.Model
     {
         public string Name { get; set; }
         private int _progress;
+        private string _status;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -16,6 +17,16 @@ namespace RemoteMonitor.Model
             {
                 _progress = value;
                 OnPropertyChanged(nameof(Progress));
+            }
+        }
+
+        public string Status
+        {
+            get { return _status; }
+            set
+            {
+                _status = value;
+                OnPropertyChanged(nameof(Status));
             }
         }
 

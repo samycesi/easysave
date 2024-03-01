@@ -165,7 +165,7 @@ namespace easysave.ViewModel
 
             foreach (var backup in BackupList.BackupTasks)
             {
-                monitorBackups.Add(new MonitorBackup(backup.Value.Name, backup.Value.State.Progress));
+                monitorBackups.Add(new MonitorBackup(backup.Value.Name, backup.Value.State.Progress, backup.Value.State.State));
             }
 
             string data = JsonSerializer.Serialize(monitorBackups);

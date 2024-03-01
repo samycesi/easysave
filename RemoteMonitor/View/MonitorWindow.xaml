@@ -7,14 +7,15 @@
              xmlns:vm="clr-namespace:RemoteMonitor.ViewModel"
              d:DataContext="{d:DesignInstance vm:MonitorViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="800">
+             d:DesignHeight="800" d:DesignWidth="900">
 
     <StackPanel>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="500" VerticalAlignment="Top">
             <DataGrid ItemsSource="{Binding MonitorBackups}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Extended" Name="dataGrid">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="120"/>
-                    <DataGridTemplateColumn Header="Progress" Width="250">
+                    <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding Name}" Width="120"/>
+                    <DataGridTextColumn Header="{DynamicResource Status}" Binding="{Binding Status}" Width="100"/>
+                    <DataGridTemplateColumn Header="{DynamicResource Progress}" Width="250">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ProgressBar Value="{Binding Progress}" Minimum="0" Maximum="100"/>
@@ -24,9 +25,105 @@
                 </DataGrid.Columns>
             </DataGrid>
         </ScrollViewer>
-        <Button Content="Start" Click="Start_Click" Width="100" Height="30" Margin="0,10,0,0"/>
-        <Button Content="Pause" Click="Pause_Click" Width="100" Height="30" Margin="0,10,0,0"/>
-        <Button Content="Stop" Click="Stop_Click" Width="100" Height="30" Margin="0,10,0,0"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10">
+            <Button Content=">"
+                x:Name="Execute"
+                Foreground="White"
+                FontSize="25"
+                FontWeight="Medium"
+                Margin="0 0 0 0"
+                VerticalAlignment="Center"
+                Click="Start_Click" Cursor="">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#00cc07"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1b611d"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="60"
+                        Height="50"
+                        CornerRadius="10"
+                        Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <Button Content="||"
+                x:Name="Pause"
+                Foreground="White"
+                FontSize="25"
+                FontWeight="Medium"
+                Margin="10 0 0 0"
+                VerticalAlignment="Center"
+                Click="Pause_Click" Cursor="">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#de6209"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#9e490d"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="60"
+                            Height="50"
+                            CornerRadius="10"
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"
+                            HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <Button Content="X"
+                x:Name="Stop"
+                Foreground="White"
+                FontSize="25"
+                FontWeight="Medium"
+                Margin="10 0 0 0"
+                VerticalAlignment="Center"
+                Click="Stop_Click" Cursor="">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#ed0000"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#940000"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="60"
+                        Height="50"
+                        CornerRadius="10"
+                        Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </StackPanel>
     </StackPanel>
 
 </UserControl>

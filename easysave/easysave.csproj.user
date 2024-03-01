@@ -21,6 +21,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Languages\textResources_en.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Languages\textResources_fr.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="View\CreateTaskWindow.xaml">
       <SubType>Designer</SubType>
     </Page>

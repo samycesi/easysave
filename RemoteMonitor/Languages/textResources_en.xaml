@@ -33,5 +33,8 @@
     <system:String x:Key="ChooseLogType">Choose the type of log files</system:String>
     <system:String x:Key="Progress">Progression</system:String>
     <system:String x:Key="Status">Status</system:String>
-
+    <system:String x:Key="IpAddress">IP Address</system:String>
+    <system:String x:Key="Port">Port</system:String>
+    <system:String x:Key="Connect">Connect</system:String>
+    <system:String x:Key="Connected">Connected Successfully</system:String>
 </ResourceDictionary>

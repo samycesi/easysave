@@ -7,11 +7,12 @@
 	xmlns:viewModel="clr-namespace:easysave.ViewModel"
         d:DataContext="{d:DesignInstance viewModel:MainViewModel}"
         mc:Ignorable="d"
-        Title="MainView" Height="600" Width="1000">
+        Closed="Window_Closed"
+        Title="MainView" Height="800" Width="1200">
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="300"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
@@ -23,7 +24,7 @@
         <StackPanel Grid.Row="1" Background="#FFFFECEC">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="500"/>
+                    <RowDefinition Height="700"/>
                     <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
 

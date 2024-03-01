@@ -33,5 +33,9 @@
     <system:String x:Key="ChooseLogType">Choisissez le type de fichiers log</system:String>
     <system:String x:Key="Progress">Progression</system:String>
     <system:String x:Key="Status">Statut</system:String>
+    <system:String x:Key="IpAddress">Adresse IP</system:String>
+    <system:String x:Key="Port">Port</system:String>
+    <system:String x:Key="Connect">Se connecter</system:String>
+    <system:String x:Key="Connected">Connexion établie</system:String>
 
 </ResourceDictionary>

@@ -116,6 +116,7 @@ namespace RemoteMonitor.ViewModel
                                 if (MonitorBackups.Count > i && jsonList[i].Name == MonitorBackups[i].Name)
                                 {
                                     MonitorBackups[i].Progress = jsonList[i].Progress;
+                                    MonitorBackups[i].Status = jsonList[i].Status;
                                 }
                                 else
                                 {
@@ -133,6 +134,7 @@ namespace RemoteMonitor.ViewModel
                                 if (MonitorBackups[j].Name == jsonList[i].Name)
                                 {
                                     MonitorBackups[j].Progress = jsonList[i].Progress;
+                                    MonitorBackups[j].Status = jsonList[i].Status;
                                 }
                                 else
                                 {

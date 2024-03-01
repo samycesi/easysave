@@ -1,12 +1,14 @@
 {
-  "stateTrackPath": "D:\\",
-  "dailyPath": "D:\\",
+  "stateTrackPath": "C:\\Users\\Bilel\\Documents",
+  "dailyPath": "C:\\Users\\Bilel\\Documents",
   "fileExtensionToEncrypt": "",
-  "cryptosoftPath": "D:\\DEV\\easysave\\CRYPTOSOFT\\cryptosoft.exe",
+  "cryptosoftPath": "C:\\Users\\Bilel\\source\\repos\\easysavedemo\\easysave\\CRYPTOSOFT\\cryptosoft.exe",
   "language": "en",
   "businessSoftwarePath": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsCalculator_11.2311.0.0_x64__8wekyb3d8bbwe\\CalculatorApp.exe",
   "logExtension": ".json",
-  "savesPath": "D:\\DEV\\easysave\\Config\\TasksSave.json",
-  "priorityExtensions": [],
-  "thresholdFileSize": 0
+  "savesPath": "C:\\Users\\Bilel\\source\\repos\\easysavedemo\\easysave\\Config\\TasksSave.json",
+  "priorityExtensions": [
+    ".txt"
+  ],
+  "thresholdFileSize": 51
 }

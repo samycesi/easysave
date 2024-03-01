@@ -1,32 +1,21 @@
 {
   "1": {
-    "Name": "Test1",
-    "SourceDirectory": "D:\\TestsSauvegardeDest\\TestCryptoSoftSubdir",
-    "DestinationDirectory": "D:\\TestsSauvegardeDest\\TestCryptoSoftSubdir - Copie",
-    "Type": 0
-  },
-  "2": {
-    "Name": "tdyqfcvyj",
-    "SourceDirectory": "D:\\test2",
-    "DestinationDirectory": "D:\\test2546",
-    "Type": 0
-  },
-  "3": {
-    "Name": "test69",
-    "SourceDirectory": "D:\\test2",
-    "DestinationDirectory": "D:\\test278",
-    "Type": 0
-  },
-  "4": {
-    "Name": "test94",
-    "SourceDirectory": "D:\\test2",
-    "DestinationDirectory": "D:\\test25",
-    "Type": 0
-  },
-  "5": {
-    "Name": "test94z",
-    "SourceDirectory": "D:\\test2",
-    "DestinationDirectory": "D:\\test294z",
-    "Type": 0
+    "Name": "Demo",
+    "SourceDirectory": "C:\\Users\\Bilel\\Documents\\Temp",
+    "DestinationDirectory": "C:\\Users\\Bilel\\Desktop\\TestDest",
+    "Type": 0,
+    "State": {
+      "Name": "Demo",
+      "DateAndTIme": "0001-01-01T00:00:00",
+      "State": "INACTIVE",
+      "TotalFilesToCopy": 0,
+      "TotalFilesSize": 0,
+      "FilesLeftToDo": 0,
+      "SizeFilesLeftToDo": 0,
+      "SourceFileDirectory": null,
+      "TargetFilesDirectory": null,
+      "Progress": 0
+    },
+    "HasPrioFilesRemaining": false
   }
 }
