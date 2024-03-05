@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "Nouveau profil",
+    "Projects": [
+      {
+        "Name": "easysave.csproj",
+        "Action": "Start",
+        "DebugTarget": "easysave"
+      },
+      {
+        "Name": "..\\RemoteMonitor\\RemoteMonitor.csproj",
+        "Action": "Start",
+        "DebugTarget": "RemoteMonitor"
+      }
+    ]
+  }
+]

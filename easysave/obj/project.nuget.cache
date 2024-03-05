@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "/ttwVU62k15DDFlhKS4BFmYEU0rnNgxJC3pN7NcN41IKTYhru/6YGlZ62yVKVXfwiO2zfV/OVcd5pm2AV34zcw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\amals\\Documents\\CleanEasySave\\easysave\\easysave.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\amals\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

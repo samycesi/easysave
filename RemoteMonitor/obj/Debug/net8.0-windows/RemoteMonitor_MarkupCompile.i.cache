@@ -1,0 +1,20 @@
+﻿RemoteMonitor
+1.0.0.0
+
+winexe
+C#
+.cs
+C:\Users\bilel\Downloads\easysave (1)\RemoteMonitor\obj\Debug\net8.0-windows\
+RemoteMonitor
+none
+false
+TRACE;DEBUG;NET;NET8_0;NETCOREAPP
+C:\Users\bilel\Downloads\easysave (1)\RemoteMonitor\App.xaml
+51026563951
+
+14119119438
+1981451641563
+MainWindow.xaml;Styles\MenuStyle.xaml;Styles\TerminalStyle.xaml;View\ConfigWindow.xaml;View\MonitorWindow.xaml;
+
+True
+

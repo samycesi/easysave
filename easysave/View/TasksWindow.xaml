@@ -1,0 +1,172 @@
+﻿<UserControl x:Class="easysave.View.TasksWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:easysave.View" xmlns:viewmodel="clr-namespace:easysave.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:TaskViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="900">
+
+    <StackPanel>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="430">
+            <DataGrid ItemsSource="{Binding BackupTasks}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Extended">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding Backup.Name}" Width="120"/>
+                    <DataGridTextColumn Header="{DynamicResource Source}" Binding="{Binding Backup.SourceDirectory}" Width="150"/>
+                    <DataGridTextColumn Header="{DynamicResource Destination}" Binding="{Binding Backup.DestinationDirectory}" Width="150"/>
+                    <DataGridTextColumn Header="{DynamicResource TypeOfBackup}" Binding="{Binding Backup.Type}" Width="100"/>
+                    <DataGridTextColumn Header="{DynamicResource Status}" Binding="{Binding Backup.State.State}" Width="100"/>
+                    <DataGridTemplateColumn Header="{DynamicResource Progress}" Width="250">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ProgressBar Value="{Binding Backup.State.Progress}" Minimum="0" Maximum="100"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    </Style>
+                </DataGrid.RowStyle>
+            </DataGrid>
+
+        </ScrollViewer>
+
+        <TextBox Style="{StaticResource TerminalTextBoxStyle}" 
+                 Text="{Binding ConsoleOutput, UpdateSourceTrigger=PropertyChanged}" 
+                 Height="200" 
+                 Margin="5"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content=">"
+                x:Name="Execute"
+                Foreground="White"
+                FontSize="25"
+                FontWeight="Medium"
+                Margin="0 0 0 0"
+                VerticalAlignment="Center"
+                Command="{Binding ExecuteBackupCommand}" Cursor="">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#00cc07"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1b611d"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="60"
+                                Height="50"
+                                CornerRadius="10"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"
+                                HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <Button Content="||"
+                x:Name="Pause"
+                Foreground="White"
+                FontSize="25"
+                FontWeight="Medium"
+                Margin="10 0 0 0"
+                VerticalAlignment="Center"
+                Command="{Binding PauseBackupCommand}" Cursor="">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#de6209"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#9e490d"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="60"
+                            Height="50"
+                            CornerRadius="10"
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"
+                            HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <Button Content="X"
+                x:Name="Stop"
+                Foreground="White"
+                FontSize="25"
+                FontWeight="Medium"
+                Margin="10 0 0 0"
+                VerticalAlignment="Center"
+                Command="{Binding StopBackupCommand}" Cursor="">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#ed0000"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#940000"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="60"
+                            Height="50"
+                            CornerRadius="10"
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"
+                            HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </StackPanel>
+
+        <Button Content="{DynamicResource Delete}"
+            x:Name="Delete"
+            Foreground="White"
+            FontSize="18"
+            FontWeight="Medium"
+            Margin="0 10 0 0"
+            VerticalAlignment="Center"
+            Command="{Binding DeleteBackupCommand}" Cursor="">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="#ed0000"/>
+                            <Setter Property="Cursor" Value="Hand"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#940000"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Width="150"
+                                Height="50"
+                                CornerRadius="10"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"
+                                HorizontalAlignment="Center"/>  
+                    </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+    </StackPanel>
+</UserControl>

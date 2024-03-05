@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    
+    <UseWPF>true</UseWPF>
+	  <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="assets\executer.png" />
+    <None Remove="assets\help.png" />
+    <None Remove="assets\logo.png" />
+    <None Remove="assets\parametres.png" />
+    <None Remove="assets\plus.png" />
+    <None Remove="assets\poubelle.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="assets\help.png" />
+    <EmbeddedResource Include="assets\parametres.png" />
+    <EmbeddedResource Include="assets\plus.png" />
+    <EmbeddedResource Include="assets\poubelle.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="assets\executer.png" />
+    <EmbeddedResource Include="assets\logo.png" />
+  </ItemGroup>
+
+</Project>
